@@ -1,6 +1,15 @@
 {
+  "name": "teamup-back",
+  "version": "1.0.0",
+  "description": "Backend for TeamUp application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js"
+  },
   "dependencies": {
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
   }
 }
