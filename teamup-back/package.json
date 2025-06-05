@@ -5,11 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "node main.js",
-    "dev": "nodemon main.js"
+    "dev": "nodemon main.js",
+    "promote-admin": "node promoteAdmin.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "nodemon": "^3.1.10"
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "nodemon": "^3.1.10",
+    "uuid": "^11.1.0"
   }
 }
