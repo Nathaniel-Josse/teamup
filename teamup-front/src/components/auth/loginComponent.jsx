@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "process";
 import { useState } from "react";
 
 export default function LoginComponent() {
@@ -13,7 +14,7 @@ export default function LoginComponent() {
         setLoading(true);
         setError("");
         try {
-            const res = await fetch("/api/login", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -21,7 +22,11 @@ export default function LoginComponent() {
             if (!res.ok) {
                 throw new Error("Identifiants invalides. Veuillez réessayer.");
             }
-            window.location.href = "/";
+            const data = await res.json();
+            localStorage.setItem("token", data.body.token);
+            localStorage.setItem("user", JSON.stringify(data.body.user));
+            console.log(data)
+            window.location.href = `/my-account`;
         } catch (err) {
             setError(err.message);
         } finally {
