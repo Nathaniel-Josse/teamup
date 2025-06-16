@@ -65,11 +65,6 @@ exports.login = async (req, res) => {
     }
 };
 
-// Déconnexion (on efface le token côté client)
-exports.logout = (req, res) => {
-    res.json({ message: 'Déconnexion réussie.' });
-};
-
 // Met à jour les informations d'un utilisateur
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
