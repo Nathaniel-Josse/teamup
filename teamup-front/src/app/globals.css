@@ -1,15 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #4c7187;
+  --foreground: #f0f4f8;
+  --h2-color: #090909;
+  --button-primary: #f97858;
+  --page-background: #f0f4f8;
 }
 
 html,
@@ -21,7 +17,6 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -36,13 +31,44 @@ body, html {
   box-sizing: border-box;
 }
 
+h1 {
+  font-family: var(--font-madimi-one), sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  margin-block: 1rem;
+  color: var(--foreground);
+}
+
+h2 {
+  font-family: var(--font-madimi-one), sans-serif;
+  font-weight: 400;
+  font-size: 2rem;
+  margin-block: 1rem;
+  color: var(--h2-color);
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+button {
+  background: var(--button-primary);
+  color: var(--foreground);
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.general-background {
+  background: var(--background);
+}
+
+.main-page-background {
+  background: var(--page-background);
+}
+
+.nav-background {
+  background: var(--button-primary);
 }

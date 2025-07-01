@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LogoComponent from "../logoComponent";
 
 export default function SignUpComponent() {
     const [email, setEmail] = useState("");
@@ -35,65 +36,65 @@ export default function SignUpComponent() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-            <div className="w-full max-w-lg bg-gray-900 rounded-2xl shadow-2xl p-12 border border-gray-800">
-                <h2 className="text-4xl font-extrabold text-center mb-10 text-white tracking-tight">Inscription</h2>
+        <div className="flex items-center justify-center bg-page-background">
+            <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 space-y-6 border border-gray-800 w-full">
+                <LogoComponent />
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {error && (
                         <div className="bg-red-900/70 text-red-300 px-6 py-3 rounded mb-6 text-center font-medium">
                             {error}
                         </div>
                     )}
-                    <div className="space-y-2">
-                        <label className="block text-lg font-semibold text-gray-200">Email</label>
+                    <div className="flex flex-col items-center">
+                        <label className="block text-lg font-semibold text-black w-full text-center mb-1">Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             required
                             autoComplete="username"
-                            className="w-4/5 px-5 py-4 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                            className="w-4/5 border border-gray-700 rounded px-2 py-1 flex-1 text-black"
                             placeholder="Votre email"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="block text-lg font-semibold text-gray-200">Mot de passe</label>
+                    <div className="flex flex-col items-center">
+                        <label className="block text-lg font-semibold text-black w-full text-center mb-1">Mot de passe</label>
                         <input
                             type="password"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             required
                             autoComplete="new-password"
-                            className="w-4/5 px-5 py-4 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                            className="w-4/5 border border-gray-700 rounded px-2 py-1 flex-1 text-black"
                             placeholder="Votre mot de passe"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="block text-lg font-semibold text-gray-200">Quel rôle avez-vous dans le sport ?</label>
+                    <div className="flex flex-col items-center">
+                        <label className="block text-lg font-semibold text-black w-full text-center mb-1">Quel rôle avez-vous dans le sport ?</label>
                         <input
                             type="text"
                             value={subrole}
                             onChange={e => setSubrole(e.target.value)}
                             required
-                            className="w-4/5 px-5 py-4 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                            className="w-4/5 border border-gray-700 rounded px-2 py-1 flex-1 text-black"
                             placeholder="Votre rôle dans le sport"
                         />
-                        <br />
-                        <small className="text-gray-400">
+                        <small className="text-gray-800 mt-2">
                             Ex : Joueur, Entraîneur, Coach, Arbitre, Supporter, etc.
                         </small>
                     </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-2/5 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xl font-bold rounded-lg"
-                    >
-                        {loading ? "Inscription en cours..." : "S'inscrire"}
-                    </button>
+                    <div className="flex flex-col items-center mt-4">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-3/5 p-2 bg-blue-700 hover:bg-blue-800 text-white text-xl font-bold rounded"
+                        >
+                            {loading ? "Inscription en cours..." : "S'inscrire"}
+                        </button>
+                    </div>
                 </form>
                 <div className="mt-10 text-center">
-                    <p className="text-base text-gray-300">
+                    <p className="text-base text-black">
                         Déjà un compte ?{" "}
                         <a href="/auth/login" className="text-blue-400 hover:underline font-semibold">
                             Se connecter

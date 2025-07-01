@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ProfilePictureComponent from "./profilePictureComponent";
+import LogoComponent from "../logoComponent";
 
 type UserInfo = {
     id: string;
@@ -26,43 +27,45 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
     };
 
     const handleUpdate = (field: keyof UserInfo) => {
+        if (!user) return;
         onUpdate({ [field]: editValues[field] });
     };
 
     const handleCopyId = () => {
         if (user?.id) {
             navigator.clipboard.writeText(user.id);
-            alert("ID copié dans le presse-papiers !");
+            alert("Votre identifiant a bien été copié dans le presse-papiers !");
         }
     }
 
     return (
-        <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informations de l&apos;utilisateur</h2>
+        <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 space-y-6">
+            <LogoComponent />
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informations principales</h2>
             
             {/* Profile Picture */}
             <ProfilePictureComponent />
             {/* User ID and Copy Button */}
             <div className="flex items-center space-x-4">
-                <label className="w-24 font-semibold text-gray-700">Votre ID : </label>
+                <label className="w-24 font-semibold text-gray-700">Votre ID: </label>
                 <span className="flex-1 text-gray-900">{user?.id}</span>
                 <button onClick={() => handleCopyId()}
-                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                className="px-3 py-1 rounded">
                     Copier l&apos;ID
                 </button>
             </div>
 
             {/* Informations display */}
             <div className="flex items-center space-x-4">
-                <label className="w-24 font-semibold text-gray-700">Email :</label>
+                <label className="w-24 font-semibold text-gray-700">Email:</label>
                 <span className="flex-1 text-gray-900">{user?.email}</span>
             </div>
             <div className="flex items-center space-x-4">
-                <label className="w-24 font-semibold text-gray-700">Mot de passe :</label>
+                <label className="w-24 font-semibold text-gray-700">Mot de passe:</label>
                 <span className="flex-1 text-gray-900">********</span>
             </div>
             <div className="flex items-center space-x-4">
-                <label className="w-24 font-semibold text-gray-700">Rôle dans le sport :</label>
+                <label className="w-24 font-semibold text-gray-700">Votre rôle dans le sport:</label>
                 <span className="flex-1 text-gray-900">{user?.subrole}</span>
             </div>
 
@@ -71,7 +74,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
             {/* Email */}
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Modifier vos informations</h2>
             <div className="flex flex-col items-center">
-                <label className="font-semibold text-gray-700">Email :</label>
+                <label className="font-semibold text-gray-700">Email:</label>
                 <input
                     type="email"
                     className="w-4/5 border rounded px-2 py-1 flex-1 text-black"
@@ -79,7 +82,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
                     onChange={(e) => handleChange("email", e.target.value)}
                 /><br />
                 <button
-                    className="w-3/5 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="w-3/5 p-2 rounded"
                     onClick={() => handleUpdate("email")}
                 >
                     Mettre à jour l&apos;email
@@ -87,7 +90,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
             </div>
             {/* Password */}
             <div className="flex flex-col items-center mt-4">
-                <label className="font-semibold text-gray-700">Mot de passe :</label>
+                <label className="font-semibold text-gray-700">Mot de passe:</label>
                 <input
                     type="password"
                     className="w-4/5 border rounded px-2 py-1 flex-1 text-black"
@@ -96,7 +99,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
                     placeholder="Nouveau mot de passe"
                 /><br />
                 <button
-                    className="w-3/5 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="w-3/5 p-2 rounded"
                     onClick={() => handleUpdate("password")}
                 >
                     Mettre à jour le mot de passe
@@ -104,7 +107,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
             </div>
             {/* Subrole */}
             <div className="flex flex-col items-center mt-4">
-                <label className="font-semibold text-gray-700">Rôle dans le sport :</label>
+                <label className="font-semibold text-gray-700">Votre rôle dans le sport:</label>
                 <input
                     type="text"
                     className="w-4/5 border rounded px-2 py-1 flex-1 text-black"
@@ -112,7 +115,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
                     onChange={(e) => handleChange("subrole", e.target.value)}
                 /><br />
                 <button
-                    className="w-3/5 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="w-3/5 p-2 rounded"
                     onClick={() => handleUpdate("subrole")}
                 >
                     Mettre à jour le rôle

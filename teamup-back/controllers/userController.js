@@ -99,3 +99,20 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ message: "Erreur de serveur.", error: err.message });
     }
 };
+
+// Récupère un utilisateur par son ID
+exports.getUserById = async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ message: "ID utilisateur manquant." });
+    }
+    try {
+        const [users] = await db.query('SELECT id, email, role, subrole FROM users WHERE id = ?', [id]);
+        if (users.length === 0) {
+            return res.status(404).json({ message: "Utilisateur non trouvé." });
+        }
+        res.json(users[0]);
+    } catch (err) {
+        res.status(500).json({ message: "Erreur de serveur.", error: err.message });
+    }
+}

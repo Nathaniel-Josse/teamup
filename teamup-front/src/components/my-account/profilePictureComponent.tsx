@@ -1,10 +1,11 @@
 import Image from 'next/image';
+import styles from './my-account-components.module.css';
 
 const ProfilePictureComponent = () => (
-    <div className="w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-gray-200 flex items-center justify-center">
+    <div className={styles.profilePicture}>
         <Image
             src="/assets/images/avatar.webp"
-            alt="Profile Avatar"
+            alt="Avatar de l'utilisateur"
             width={120}
             height={120}
             className="object-cover w-full h-full"

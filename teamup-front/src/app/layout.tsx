@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Madimi_One } from "next/font/google";
 import "./globals.css";
 import TabBar from "@/components/tabbar";
+import Footer from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const madimiOne = Madimi_One({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-madimi-one",
+});
+
 export const metadata: Metadata = {
-  title: "TeamUp",
+  title: "TeamUp!",
   description: "Un Outil pour les Équipes Sportives",
 };
 
@@ -25,8 +33,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className="pb-20">{children}</div>
+      <body className={`${madimiOne.variable} font-madimi-one`}>
+        <div>{children}</div>
+        <Footer />
         <TabBar />
       </body>
     </html>
