@@ -8,6 +8,9 @@ const Footer: React.FC = () => (
                     Politique de Confidentialité
                 </a>
                 <a href="/terms" className="hover:underline">
+                    Conditions d&apos;Utilisation
+                </a>
+                <a href="/legal" className="hover:underline">
                     Mentions Légales
                 </a>
             </div>

@@ -9,8 +9,15 @@ export default function SignUpComponent() {
     const [subrole, setSubrole] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [authorized, setAuthorized] = useState(false);
 
-    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
+    const isFormValid =
+        email.trim() !== "" &&
+        password.trim() !== "" &&
+        subrole.trim() !== "" &&
+        authorized;
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setError("");
@@ -83,11 +90,23 @@ export default function SignUpComponent() {
                             Ex : Joueur, Entraîneur, Coach, Arbitre, Supporter, etc.
                         </small>
                     </div>
+                    <div className="flex items-center mt-2">
+                        <input
+                            type="checkbox"
+                            id="authorize"
+                            checked={authorized}
+                            onChange={e => setAuthorized(e.target.checked)}
+                            className="w-5 h-5 mr-2 accent-blue-700"
+                        />
+                        <label htmlFor="authorize" className="text-sm text-black select-none">
+                            J&apos;ai pris connaissance de la <a href="/privacy" className="text-blue-400 hover:underline font-semibold">politique de confidentialité</a> et des <a href="/terms" className="text-blue-400 hover:underline font-semibold">conditions d&apos;utilisation</a> de TeamUp et les accepte.
+                        </label>
+                    </div>
                     <div className="flex flex-col items-center mt-4">
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-3/5 p-2 bg-blue-700 hover:bg-blue-800 text-white text-xl font-bold rounded"
+                            disabled={loading || !isFormValid}
+                            className="w-3/5 p-2 bg-blue-700 hover:bg-blue-800 text-white text-xl font-bold rounded disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {loading ? "Inscription en cours..." : "S'inscrire"}
                         </button>

@@ -25,7 +25,7 @@ app.post('/api/login', userController.login);
 app.put('/api/users/:id', userController.updateUser);
 app.get('/api/users/:id', userController.getUserById);
 
-app.post('/api/profiles/create', profileController.createProfile);
+app.post('/api/profiles', profileController.createProfile);
 app.get('/api/profiles/:id', profileController.getProfileById);
 app.put('/api/profiles/:id', profileController.updateProfile);
 app.delete('/api/profiles/:id', profileController.deleteProfile);

@@ -148,6 +148,9 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
                         type="date"
                         className="w-4/5 border rounded px-2 py-1 flex-1 text-black"
                     />
+                    <div className="text-sm text-gray-500 mt-4 mb-4">
+                        <small className='text-black'>Cette information n&apos;est pas obligatoire mais elle est fortement recommandée si vous participez à des événements qui demandent un contrôle par pièce d&apos;identité.</small>
+                    </div>
                 </div>
                 <div className="flex flex-col items-center">
                     <label className="font-semibold text-gray-700 w-full text-center mb-1">

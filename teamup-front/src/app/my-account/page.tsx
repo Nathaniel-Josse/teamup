@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
+import styles from "./my-account.module.css";
 import UserInfosComponent from "@/components/my-account/userInfosComponent";
 import NoProfileYetComponent from "@/components/my-account/noProfileYetComponent";
 import ProfileComponent from "@/components/my-account/profileComponent";
@@ -25,7 +26,7 @@ type UserProfile = {
 
 export default function MyAccountMainPage() {
     const [user, setUser] = useState<UserInfo | null>(null);
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [noProfile, setNoProfile] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
 
@@ -52,7 +53,7 @@ export default function MyAccountMainPage() {
             // CHECK 2 : Récupération du profil complet
 
             const profileRes = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.id}`
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profileId}`
             );
 
             if (!profileRes.ok) {
@@ -117,7 +118,8 @@ export default function MyAccountMainPage() {
     const handleProfileUpdate = async (updated: Partial<UserProfile>) => {
         if (!user) return;
         try {
-            const res = await fetch(
+            const res = profile?.id ? 
+            await fetch(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${profile.id}`,
                 {
                     method: "PUT",
@@ -126,7 +128,18 @@ export default function MyAccountMainPage() {
                     },
                     body: JSON.stringify(updated),
                 }
-            );
+            ) :
+            await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ user_id: user.id, ...updated }),
+                }
+            ); 
+            
             const data = await res.json();
             if (res.ok) {
                 setProfile((prev: UserProfile | null) => prev ? { ...prev, ...updated } : prev);
@@ -154,7 +167,7 @@ export default function MyAccountMainPage() {
             )}
 
             <div className="mb-4">
-                {message && <div className="mb-4 text-green-600">{message}</div>}
+                {message && <div className={styles.messageBox}>{message}</div>}
                 <UserInfosComponent user={user} onUpdate={handleUserUpdate} />
             </div>
 

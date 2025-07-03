@@ -1,7 +1,27 @@
 const db = require('../config/db');
 
-const LEVELS = ['beginner', 'intermediate', 'expert'];
-const AVAILABILITIES = ['weekday', 'weekend', 'both'];
+// CONSTANTS DEFINITIONS
+
+const BEGINNER = 'beginner';
+const INTERMEDIATE = 'intermediate';
+const EXPERT = 'expert';
+
+const WEEKDAY = 'weekday';
+const WEEKEND = 'weekend';
+const BOTH = 'both';
+
+// We define the associated array of levels with their labels
+const LEVELS = [
+    { id: BEGINNER, label: 'Débutant' },
+    { id: INTERMEDIATE, label: 'Intermédiaire' },
+    { id: EXPERT, label: 'Expert' }
+];
+
+const AVAILABILITIES = [
+    { id: WEEKDAY, label: 'Les jours de semaine' },
+    { id: WEEKEND, label: 'En week-end' },
+    { id: BOTH, label: 'Aux deux' }
+];
 
 /* CRUD */
 
@@ -22,8 +42,18 @@ exports.createProfile = async (req, res) => {
             return res.status(400).json({ error: 'Données incorrectes' });
         }
 
-        const [result] = await db.execute(
-            `INSERT INTO profile 
+        console.log('Creating profile with data:', {
+            user_id,
+            fav_sport_id,
+            first_name,
+            last_name,
+            birth_date,
+            level,
+            availability
+        });
+
+        const [result] = await db.query(
+            `INSERT INTO profiles 
                 (user_id, fav_sport_id, first_name, last_name, birth_date, level, availability, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
             [user_id, fav_sport_id, first_name, last_name, birth_date, level, availability]
@@ -39,8 +69,16 @@ exports.createProfile = async (req, res) => {
 exports.getProfileById = async (req, res) => {
     try {
         const { id } = req.params;
-        const [rows] = await db.execute('SELECT * FROM profile WHERE id = ?', [id]);
+        const [rows] = await db.query('SELECT * FROM profiles WHERE id = ?', [id]);
         if (rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+
+        // Convert level and availability to their labels
+        const profile = rows[0];
+        profile.level = LEVELS.find(l => l.id === profile.level)?.label || profile.level;
+        profile.availability = AVAILABILITIES.find(a => a.id === profile.availability)?.label || profile.availability;
+
+        console.log(profile);
+
         res.json(rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -67,8 +105,8 @@ exports.updateProfile = async (req, res) => {
             return res.status(400).json({ error: 'Invalid availability value' });
         }
 
-        const [result] = await db.execute(
-            `UPDATE profile SET 
+        const [result] = await db.query(
+            `UPDATE profiles SET 
                 fav_sport_id = COALESCE(?, fav_sport_id),
                 first_name = COALESCE(?, first_name),
                 last_name = COALESCE(?, last_name),
@@ -91,7 +129,7 @@ exports.updateProfile = async (req, res) => {
 exports.deleteProfile = async (req, res) => {
     try {
         const { id } = req.params;
-        const [result] = await db.execute('DELETE FROM profile WHERE id = ?', [id]);
+        const [result] = await db.query('DELETE FROM profiles WHERE id = ?', [id]);
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Profile not found' });
         res.json({ message: 'Profile deleted' });
     } catch (err) {

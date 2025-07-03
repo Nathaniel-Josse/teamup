@@ -54,6 +54,11 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
                     Copier l&apos;ID
                 </button>
             </div>
+            <div className="text-sm text-gray-500 mb-4">
+                <small className='text-black'>Attention: Votre ID est strictement confidentiel. Veuillez ne le diffuser qu&apos;à des personnes de confiance.</small>
+            </div>
+
+            <hr className="text-gray-300"></hr>
 
             {/* Informations display */}
             <div className="flex items-center space-x-4">
@@ -69,7 +74,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
                 <span className="flex-1 text-gray-900">{user?.subrole}</span>
             </div>
 
-            <hr></hr>
+            <hr className="text-gray-300"></hr>
             {/* Editable fields */}
             {/* Email */}
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Modifier vos informations</h2>

@@ -18,7 +18,7 @@ exports.createSport = async (req, res) => {
 // Get all sports
 exports.getAllSports = async (req, res) => {
     try {
-        const [sports] = await db.execute('SELECT * FROM sports');
+        const [sports] = await db.execute('SELECT * FROM sports ORDER BY label ASC');
         res.json(sports);
     } catch (error) {
         res.status(500).json({ message: error.message });
