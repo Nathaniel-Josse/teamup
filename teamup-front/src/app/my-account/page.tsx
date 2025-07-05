@@ -19,7 +19,7 @@ type UserProfile = {
     first_name: string;
     last_name: string;
     birth_date?: string | null;
-    fav_sport: string;
+    fav_sport_id: number;
     level: 'beginner' | 'intermediate' | 'expert';
     availability: 'weekday' | 'weekend' | 'both';
 };
@@ -30,59 +30,57 @@ export default function MyAccountMainPage() {
     const [noProfile, setNoProfile] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
 
-    const getProfile = async () => {
-        
-        // CHECK 1 : Est-ce que le profil de l'utilisateur existe ?
-
-        if (!user) return;
-        try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${user.id}`
-            )
-            if (!res.ok) {
-                throw new Error("Erreur lors de la récupération du profil.");
-            }
-            const data = await res.json();
-            
-            if (!data.exists) {
-                setNoProfile(true);
-                return;
-            }
-            setNoProfile(false);
-
-            // CHECK 2 : Récupération du profil complet
-
-            const profileRes = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profileId}`
-            );
-
-            if (!profileRes.ok) {
-                throw new Error("Erreur lors de la récupération du profil.");
-            }
-            const profileData = await profileRes.json();
-            setProfile(profileData);
-        } catch (err) {
-            if (err instanceof Error) {
-                setMessage(err.message);
-            } else {
-                setMessage("Une erreur inconnue est survenue.");
-            }
-        } 
-    };
-
     useEffect(() => {
+        const getProfile = async () => {
+        
+            // CHECK 1 : Est-ce que le profil de l'utilisateur existe ?
+
+            if (!user) return;
+            try {
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${user.id}`
+                )
+                if (!res.ok) {
+                    throw new Error("Erreur lors de la récupération du profil.");
+                }
+                const data = await res.json();
+                
+                if (!data.exists) {
+                    setNoProfile(true);
+                    return;
+                }
+                setNoProfile(false);
+
+                // CHECK 2 : Récupération du profil complet
+
+                const profileRes = await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profileId}`
+                );
+
+                if (!profileRes.ok) {
+                    throw new Error("Erreur lors de la récupération du profil.");
+                }
+                const profileData = await profileRes.json();
+                setProfile(profileData);
+            } catch (err) {
+                if (err instanceof Error) {
+                    setMessage(err.message);
+                } else {
+                    setMessage("Une erreur inconnue est survenue.");
+                }
+            } 
+        }
+
         if (typeof window !== "undefined") {
             const userStr = localStorage.getItem("user");
-            if (userStr) {
-                setUser(JSON.parse(userStr));
-            } else {
+            if (!userStr) {
                 window.location.href = "/auth/login";
                 return;
             }
+            setUser(JSON.parse(userStr));
+            getProfile();
         }
     }, []);
-
-    getProfile();
 
     const handleUserUpdate = async (updated: Partial<UserInfo>) => {
         if (!user) return;

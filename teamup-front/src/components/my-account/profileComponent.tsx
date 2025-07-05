@@ -8,7 +8,7 @@ type Sport = {
     label: string;
 };
 
-type Profile = {
+type UserProfile = {
     first_name: string;
     last_name: string;
     birth_date?: string | null;
@@ -18,12 +18,12 @@ type Profile = {
 };
 
 type ProfileComponentProps = {
-    profile: Profile | null;
-    onUpdate: (updated: Profile) => void;
+    profile: UserProfile | null;
+    onUpdate: (updated: UserProfile) => void;
 };
 
 const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }) => {
-    const [form, setForm] = useState<Profile>({
+    const [form, setForm] = useState<UserProfile>({
         first_name: profile?.first_name || '',
         last_name: profile?.last_name || '',
         birth_date: profile?.birth_date || '',

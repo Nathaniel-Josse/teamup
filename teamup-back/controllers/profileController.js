@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const dayjs = require('dayjs');
 
 // CONSTANTS DEFINITIONS
 
@@ -76,6 +77,11 @@ exports.getProfileById = async (req, res) => {
         const profile = rows[0];
         profile.level = LEVELS.find(l => l.id === profile.level)?.label || profile.level;
         profile.availability = AVAILABILITIES.find(a => a.id === profile.availability)?.label || profile.availability;
+
+        // Format birth_date if it exists
+        if (profile.birth_date) {
+            profile.birth_date = dayjs(profile.birth_date).format('DD/MM/YYYY');
+        }
 
         console.log(profile);
 
