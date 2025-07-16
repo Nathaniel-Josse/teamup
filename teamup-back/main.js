@@ -18,6 +18,7 @@ app.use(cors({
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
 const sportController = require('./controllers/sportsController');
+const eventController = require('./controllers/eventController');
 
 // Routes
 app.post('/api/signup', userController.signup);
@@ -35,6 +36,12 @@ app.post('/api/sports', sportController.createSport);
 app.get('/api/sports', sportController.getAllSports);
 app.get('/api/sports/:id', sportController.getSportById);
 app.delete('/api/sports/:id', sportController.deleteSport);
+
+app.post('/api/events', eventController.createEvent);
+app.get('/api/events', eventController.getAllEvents);
+app.get('/api/events/:id', eventController.getEventById);
+app.put('/api/events/:id', eventController.updateEvent);
+app.delete('/api/events/:id', eventController.deleteEvent);
 
 app.get('/', (req, res) => {
     res.send('Eh mais, ne serait-ce pas le backend de TeamUp ?');
