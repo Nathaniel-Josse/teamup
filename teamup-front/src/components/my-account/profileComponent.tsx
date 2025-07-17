@@ -39,7 +39,6 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sports`);
                 const data = await res.json();
-                console.log(data);
                 setSports(data);
             } catch {
                 setSports([]);

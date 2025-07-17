@@ -5,6 +5,7 @@ import styles from "./my-account.module.css";
 import UserInfosComponent from "@/components/my-account/userInfosComponent";
 import NoProfileYetComponent from "@/components/my-account/noProfileYetComponent";
 import ProfileComponent from "@/components/my-account/profileComponent";
+import Spinner from "@/components/spinner";
 
 type UserInfo = {
     id: string;
@@ -29,9 +30,10 @@ export default function MyAccountMainPage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [noProfile, setNoProfile] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const getProfile = async () => {
+        const getProfile = async (user: UserInfo) => {
         
             // CHECK 1 : Est-ce que le profil de l'utilisateur existe ?
 
@@ -53,15 +55,16 @@ export default function MyAccountMainPage() {
 
                 // CHECK 2 : Récupération du profil complet
 
-                const profileRes = await fetch(
+                await fetch(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profileId}`
-                );
+                ).then(async res => {
+                    if (!res.ok) {
+                        throw new Error("Erreur lors de la récupération du profil.");
+                    }
+                    const profileData = await res.json();
+                    setProfile(profileData);
+                });
 
-                if (!profileRes.ok) {
-                    throw new Error("Erreur lors de la récupération du profil.");
-                }
-                const profileData = await profileRes.json();
-                setProfile(profileData);
             } catch (err) {
                 if (err instanceof Error) {
                     setMessage(err.message);
@@ -77,8 +80,11 @@ export default function MyAccountMainPage() {
                 window.location.href = "/auth/login";
                 return;
             }
-            setUser(JSON.parse(userStr));
-            getProfile();
+            const currentUser = JSON.parse(userStr)
+            setUser(currentUser);
+            getProfile(currentUser).then(() => {
+                setIsLoading(false)
+            });
         }
     }, []);
 
@@ -159,17 +165,22 @@ export default function MyAccountMainPage() {
     return (
         <div className="text-center">
             <h1>Mon Compte</h1>
+            {isLoading ? (
+                <Spinner />
+            ) : (
+                <div>
+                    {noProfile && (
+                        <NoProfileYetComponent />
+                    )}
 
-            {noProfile && (
-                <NoProfileYetComponent />
+                    <div className="mb-4">
+                        {message && <div className={styles.messageBox}>{message}</div>}
+                        <UserInfosComponent user={user} onUpdate={handleUserUpdate} />
+                    </div>
+
+                    <ProfileComponent profile={profile} onUpdate={handleProfileUpdate} />
+                </div>
             )}
-
-            <div className="mb-4">
-                {message && <div className={styles.messageBox}>{message}</div>}
-                <UserInfosComponent user={user} onUpdate={handleUserUpdate} />
-            </div>
-
-            <ProfileComponent profile={profile} onUpdate={handleProfileUpdate} />
         </div>
     );
 }
