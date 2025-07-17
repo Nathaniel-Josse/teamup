@@ -19,6 +19,7 @@ exports.uploadEventPicture = upload.single('picture');
 
 // Create a new event
 exports.createEvent = async (req, res) => {
+    console.log("Creating event with body:", req.body);
     const {
         organizer_user_id,
         sport_id,
@@ -60,7 +61,7 @@ exports.createEvent = async (req, res) => {
         await db.query(
             `INSERT INTO events (
                 organizer_user_id, sport_id, title, starting_date, ending_date, location, lat, lon, max_attendees, status, description, picture
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 organizer_user_id,
                 sport_id,
@@ -76,7 +77,7 @@ exports.createEvent = async (req, res) => {
                 picture
             ]
         );
-        res.status(201).json({ message: 'Événement créé', eventId: id, picture });
+        res.status(201).json({ message: 'Événement créé', picture });
     } catch (err) {
         res.status(500).json({ message: 'Erreur de serveur.', error: err.message });
     }

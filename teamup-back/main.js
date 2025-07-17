@@ -1,13 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -37,10 +39,10 @@ app.get('/api/sports', sportController.getAllSports);
 app.get('/api/sports/:id', sportController.getSportById);
 app.delete('/api/sports/:id', sportController.deleteSport);
 
-app.post('/api/events', eventController.createEvent);
+app.post('/api/events', eventController.uploadEventPicture, eventController.createEvent);
 app.get('/api/events', eventController.getAllEvents);
 app.get('/api/events/:id', eventController.getEventById);
-app.put('/api/events/:id', eventController.updateEvent);
+app.put('/api/events/:id', eventController.uploadEventPicture, eventController.updateEvent);
 app.delete('/api/events/:id', eventController.deleteEvent);
 
 app.get('/', (req, res) => {

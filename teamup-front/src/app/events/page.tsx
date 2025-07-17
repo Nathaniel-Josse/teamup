@@ -66,38 +66,46 @@ export default function Events() {
                     formData.append(key, value as string | Blob);
                 });
                 formData.append("picture", pictureFile);
+                formData.append("organizer_user_id", user?.id || "");
                 requestBody = formData;
-                // Do not set Content-Type header for FormData, browser will set it
             } else {
                 requestBody = JSON.stringify(form);
                 headers["Content-Type"] = "application/json";
             }
 
+            console.log("Form data to be sent:", form);
+
             if (form.is_new_event) {
-                form.organizer_user_id = user?.id;
-                delete form.is_new_event;
+                console.log("user :", user);
                 try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`, {
+                    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`, {
                         method: 'POST',
                         headers,
                         body: requestBody,
+                    }).then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Erreur lors de l'ajout de l'événement.");
+                        }
+                        alert("Événement ajouté avec succès !");
+                        // We redirect to the events page to see the new event
+                        window.location.reload();
                     });
-                    const data = await res.json();
-                    setEvents(prev => [...prev, data]);
                 } catch (err) {
                     console.error("Erreur lors de l'ajout de l'événement:", err);
                 }
             } else {
-                form.organizer_user_id = user?.id;
-                delete form.is_new_event;
                 try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${form.id}`, {
+                    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${form.id}`, {
                         method: 'PUT',
                         headers,
                         body: requestBody,
+                    }).then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Erreur lors de la mise à jour de l'événement.");
+                        }
+                        alert("Événement mis à jour avec succès !");
+                        window.location.reload();
                     });
-                    const data = await res.json();
-                    setEvents(prev => prev.map(event => event?.id === data.id ? data : event));
                 } catch (err) {
                     console.error("Erreur lors de la mise à jour de l'événement:", err);
                 }

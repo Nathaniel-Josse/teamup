@@ -184,7 +184,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                 </div>
                 <div className="flex flex-col items-center">
                     <label className="font-semibold text-gray-700 w-full text-center mb-1">
-                        Adresse et position sur la carte:
+                        Rentrez l&apos;adresse de l&apos;événement:
                     </label>
                     <AddressInputWithMapComponent
                         onAddressChange={setAddressData}

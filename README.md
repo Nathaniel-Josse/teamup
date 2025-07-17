@@ -1,8 +1,7 @@
 NextJS/Node project.
 README will be updated later.
 
-For dev:
-`cd ./teamup-back`
-`npm run start`
-`cd ./teamup-front`
-`npm run dev`
+For dev:<br>
+`cd ./teamup-back` => `npm run dev`<br>
+`cd ./teamup-back` => `node server.js`<br>
+`cd ./teamup-front` => `npm run dev`

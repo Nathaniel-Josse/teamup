@@ -28,11 +28,11 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event }) => {
         <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             <div className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
                 <Image
-                    src={event.picture}
+                    src={process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + event.picture}
                     alt={event.title}
                     className="object-cover w-full h-full"
-                    width={128}
-                    height={128}
+                    width={800}
+                    height={800}
                     style={{ objectFit: "cover", width: "100%", height: "100%" }}
                 />
             </div>

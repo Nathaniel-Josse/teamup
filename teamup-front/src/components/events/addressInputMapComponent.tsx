@@ -114,12 +114,12 @@ export default function AddressInputWithMapComponent({
                 type="text"
                 value={address}
                 onChange={handleAddressInput}
-                className="w-full p-2 border border-black rounded mb-2"
+                className="w-full p-2 border border-black rounded mb-2 text-black"
                 placeholder="Rechercher une adresse"
-                onFocus={() => setShowSuggestions(suggestions.length > 0)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                onFocus={() => setShowSuggestions(suggestions.length > 3)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
             />
-            {showSuggestions && suggestions.length > 0 && (
+            {showSuggestions && suggestions.length > 3 && (
                 <ul className="absolute z-10 bg-white border rounded w-full max-h-48 overflow-y-auto shadow">
                     {suggestions.map((s, idx) => (
                         <li
