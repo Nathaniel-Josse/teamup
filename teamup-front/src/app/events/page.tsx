@@ -2,7 +2,6 @@
 import EventCardComponent from "@/components/events/eventCardComponent";
 import AddOrUpdateEventComponent from "@/components/events/addOrUpdateEventComponent";
 import { useEffect, useState } from "react";
-import { hadUnsupportedValue } from "next/dist/build/analysis/get-page-static-info";
 import { checkEventForm } from "@/helpers/checkForms";
 
 export default function Events() {
@@ -115,6 +114,23 @@ export default function Events() {
 
     return (
         <main className="container mx-auto p-4 flex flex-col items-center">
+            <h1 className="text-2xl font-bold mb-6">Événements</h1>
+            <div className="mb-6 flex flex-col items-center">
+                {user && (
+                    <button
+                        className="px-4 py-2 text-white rounded"
+                        onClick={() => setShowForm((prev) => !prev)}
+                    >
+                        {showForm ? "Fermer le formulaire" : "Ajouter un événement"}
+                    </button>
+                    )
+                }
+                {showForm && user && (
+                    <div>
+                        <AddOrUpdateEventComponent event={null} onUpdate={handleEventAddOrUpdate} userId={user.id} />
+                    </div>
+                )}
+            </div>
             {events.length === 0 ? (
                 <div className="text-center text-gray-500 mt-10">Aucun événement trouvé.</div>
             ) : (
@@ -123,23 +139,6 @@ export default function Events() {
                         <EventCardComponent event={event} />
                     </div>
                 ))
-            )}
-            {user && (
-                <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    onClick={() => setShowForm((prev) => !prev)}
-                >
-                    {showForm ? "Fermer le formulaire" : "Ajouter un événement"}
-                </button>
-                )
-            }
-            {showForm && (
-                <div className="mt-6">
-                    <AddOrUpdateEventComponent event={null} onUpdate={handleEventAddOrUpdate} />
-                    <div className="p-4 border rounded bg-gray-50">
-                        Formulaire d&apos;ajout d&apos;événement ici.
-                    </div>
-                </div>
             )}
         </main>
     );

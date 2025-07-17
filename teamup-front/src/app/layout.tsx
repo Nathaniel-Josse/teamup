@@ -4,6 +4,7 @@ import { Madimi_One } from "next/font/google";
 import "./globals.css";
 import TabBar from "@/components/tabbar";
 import Footer from "@/components/footer";
+import 'leaflet/dist/leaflet.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

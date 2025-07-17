@@ -14,6 +14,13 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
 const geocodingClient = mbxGeocoding({ accessToken: MAPBOX_TOKEN });
 
+const locationIcon = L.icon({
+    iconUrl: '/assets/images/location-sign.webp',
+    iconSize:     [75, 75], // size of the icon
+    iconAnchor:   [37, 75], // point of the icon which will correspond to marker's location
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
 const LocationMarker = ({ setPosition }: { setPosition: Function }) => {
     useMapEvents({
         click(e) {
@@ -108,7 +115,7 @@ export default function AddressInputWithMapComponent({
     };
 
     return (
-        <div className="relative">
+        <div className="w-full">
             <input
                 ref={inputRef}
                 type="text"
@@ -144,7 +151,7 @@ export default function AddressInputWithMapComponent({
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <LocationMarker setPosition={setPosition} />
-                <Marker position={[position.lat, position.lng]} />
+                <Marker position={[position.lat, position.lng]} icon={locationIcon} />
             </MapContainer>
         </div>
     );
