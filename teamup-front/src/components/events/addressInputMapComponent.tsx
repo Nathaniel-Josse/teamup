@@ -7,9 +7,6 @@ import mapboxgl from "mapbox-gl"; // for types only
 import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding";
 import L from "leaflet";
 
-// Default to Paris
-const defaultPosition = [48.8566, 2.3522];
-
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
 const geocodingClient = mbxGeocoding({ accessToken: MAPBOX_TOKEN });
@@ -32,12 +29,14 @@ const LocationMarker = ({ setPosition }: { setPosition: Function }) => {
 
 export default function AddressInputWithMapComponent({
     onAddressChange,
+    defaultPosition = [48.8566, 2.3522], // Default to Paris coordinates
 }: {
     onAddressChange: (info: {
         address: string;
         lat: number;
         lng: number;
     }) => void;
+    defaultPosition?: [number, number];
 }) {
     const [address, setAddress] = useState("");
     const [position, setPosition] = useState<{ lat: number; lng: number }>({

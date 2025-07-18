@@ -151,7 +151,7 @@ exports.profileExistsByUserId = async (req, res) => {
         const { userId } = req.params;
         const [rows] = await db.query('SELECT id FROM profiles WHERE user_id = ?', [userId]);
         if (rows.length > 0) {
-            res.json({ exists: true, profileId: rows[0].id });
+            res.json({ exists: true, profile_id: rows[0].id });
         } else {
             res.json({ exists: false });
         }

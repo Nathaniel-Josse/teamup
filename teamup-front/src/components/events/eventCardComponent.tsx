@@ -4,11 +4,18 @@ import Image from "next/image";
 type Status = 'open' | 'closed' | 'done' | 'cancelled';
 
 type Event = {
+    id: number;
+    sport_id: number;
+    organizer_user_id: string;
     picture: string;
     title: string;
+    description: string;
     starting_date: string;
     ending_date: string;
     location: string;
+    lat: number;
+    lon: number;
+    max_attendees: number;
     status: Status;
 };
 
@@ -28,7 +35,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event }) => {
         <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             <div className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
                 <Image
-                    src={process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + event.picture}
+                    src={process.env.NEXT_PUBLIC_UPLOAD_PROTOCOL + "://" + process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + event.picture}
                     alt={event.title}
                     className="object-cover w-full h-full"
                     width={800}

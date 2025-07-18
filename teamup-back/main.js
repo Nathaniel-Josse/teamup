@@ -21,6 +21,7 @@ const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
 const sportController = require('./controllers/sportsController');
 const eventController = require('./controllers/eventController');
+const userEventController = require('./controllers/userEventController');
 
 // Routes
 app.post('/api/signup', userController.signup);
@@ -44,6 +45,10 @@ app.get('/api/events', eventController.getAllEvents);
 app.get('/api/events/:id', eventController.getEventById);
 app.put('/api/events/:id', eventController.uploadEventPicture, eventController.updateEvent);
 app.delete('/api/events/:id', eventController.deleteEvent);
+
+app.post('/api/events/:eventId/register', userEventController.registerForEvent);
+app.get('/api/events/:eventId/users/:userId/registered', userEventController.isUserRegisteredForEvent);
+app.delete('/api/events/:eventId/users/:userId/unregister', userEventController.unregisterFromEvent);
 
 app.get('/', (req, res) => {
     res.send('Eh mais, ne serait-ce pas le backend de TeamUp ?');

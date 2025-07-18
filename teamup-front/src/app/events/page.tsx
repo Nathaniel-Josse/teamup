@@ -54,7 +54,7 @@ export default function Events() {
         fetchEvents();
     }, []);
 
-    const handleEventAddOrUpdate = async (form: any, pictureFile: File | null) => {
+    const handleAddEvent = async (form: any, pictureFile: File | null) => {
         if (checkEventForm(form) === true) {
             // Prepare FormData if there's a picture file
             let requestBody: BodyInit;
@@ -74,40 +74,21 @@ export default function Events() {
 
             console.log("Form data to be sent:", form);
 
-            if (form.is_new_event) {
-                console.log("user :", user);
-                try {
-                    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`, {
-                        method: 'POST',
-                        headers,
-                        body: requestBody,
-                    }).then((response) => {
-                        if (!response.ok) {
-                            throw new Error("Erreur lors de l'ajout de l'événement.");
-                        }
-                        alert("Événement ajouté avec succès !");
-                        // We redirect to the events page to see the new event
-                        window.location.reload();
-                    });
-                } catch (err) {
-                    console.error("Erreur lors de l'ajout de l'événement:", err);
-                }
-            } else {
-                try {
-                    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${form.id}`, {
-                        method: 'PUT',
-                        headers,
-                        body: requestBody,
-                    }).then((response) => {
-                        if (!response.ok) {
-                            throw new Error("Erreur lors de la mise à jour de l'événement.");
-                        }
-                        alert("Événement mis à jour avec succès !");
-                        window.location.reload();
-                    });
-                } catch (err) {
-                    console.error("Erreur lors de la mise à jour de l'événement:", err);
-                }
+            try {
+                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`, {
+                    method: 'POST',
+                    headers,
+                    body: requestBody,
+                }).then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Erreur lors de l'ajout de l'événement.");
+                    }
+                    alert("Événement ajouté avec succès !");
+                    // We redirect to the events page to see the new event
+                    window.location.reload();
+                });
+            } catch (err) {
+                console.error("Erreur lors de l'ajout de l'événement:", err);
             }
         }
     };
@@ -127,7 +108,7 @@ export default function Events() {
                 }
                 {showForm && user && (
                     <div>
-                        <AddOrUpdateEventComponent event={null} onUpdate={handleEventAddOrUpdate} userId={user.id} />
+                        <AddOrUpdateEventComponent event={null} onUpdate={handleAddEvent} userId={user.id} />
                     </div>
                 )}
             </div>
@@ -135,9 +116,9 @@ export default function Events() {
                 <div className="text-center text-gray-500 mt-10">Aucun événement trouvé.</div>
             ) : (
                 events.map((event, idx) => (
-                    <div key={idx} className="mb-8">
+                    <a href={`/events/${event.id}`} key={idx} className="mb-8 block">
                         <EventCardComponent event={event} />
-                    </div>
+                    </a>
                 ))
             )}
         </main>

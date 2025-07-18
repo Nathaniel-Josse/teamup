@@ -10,6 +10,8 @@ type Sport = {
 };
 
 type Event = {
+    id?: number;
+    organizer_user_id?: string;
     sport_id: number;
     title: string;
     starting_date: string;
@@ -21,7 +23,6 @@ type Event = {
     status: Status;
     description: string;
     picture: string | null;
-    is_new_event?: boolean;
 };
 
 type EventComponentProps = {
@@ -43,7 +44,6 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
         status: event?.status || 'open',
         description: event?.description || '',
         picture: event?.picture || null,
-        is_new_event: event ? false : true,
     });
 
     const [sports, setSports] = useState<Sport[]>([]);
@@ -137,6 +137,14 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
         onUpdate({ ...mergedForm }, pictureFile);
     };
 
+    const getPictureUrl = () => {
+        try {
+            return form.picture ? process.env.NEXT_PUBLIC_UPLOAD_PROTOCOL + "://" + process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + form.picture : form.picture;
+        } catch {
+            return "";
+        }
+    }
+
     return (
         <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 space-y-6 mt-8">
             { isLoading ? (
@@ -214,6 +222,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                                     </label>
                                     <AddressInputWithMapComponent
                                         onAddressChange={setAddressData}
+                                        defaultPosition={[form?.lat, form?.lon]}
                                     />
                                 </div>
                                 <div className="flex flex-col items-center">
@@ -274,7 +283,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                                     />
                                     {form.picture && (
                                         <img
-                                            src={form.picture}
+                                            src={getPictureUrl()}
                                             alt="Aperçu"
                                             className="mt-2 rounded max-h-40"
                                         />

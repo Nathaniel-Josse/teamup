@@ -86,7 +86,7 @@ exports.createEvent = async (req, res) => {
 // Get all events
 exports.getAllEvents = async (req, res) => {
     try {
-        const [events] = await db.query('SELECT * FROM events');
+        const [events] = await db.query('SELECT * FROM events ORDER BY status ASC, starting_date ASC');
         // We convert the date fields to "dd/mm/yyyy hh:mm" format for better readability
         events.forEach(event => {
             if (event.starting_date) {
@@ -163,8 +163,21 @@ exports.updateEvent = async (req, res) => {
         lon,
         max_attendees,
         status,
-        description
+        description,
+        userId
     } = req.body;
+
+    // We check if the user is the organizer of the event
+    if (!userId) {
+        return res.status(403).json({ message: "Utilisateur non autorisé." });
+    }
+    const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
+    if (event.length === 0) {
+        return res.status(404).json({ message: "Événement non trouvé." });
+    }
+    if (event[0].organizer_user_id !== userId) {
+        return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cet événement." });
+    }
 
     let picture = null;
     if (req.file) {
@@ -206,10 +219,22 @@ exports.updateEvent = async (req, res) => {
 // Delete an event
 exports.deleteEvent = async (req, res) => {
     const { id } = req.params;
+    const { userId } = req.body;
+    // We check if the user is the organizer of the event
+    if (!userId) {
+        return res.status(403).json({ message: "Utilisateur non autorisé." });
+    }
     if (!id) {
         return res.status(400).json({ message: "ID événement manquant." });
     }
     try {
+        const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
+        if (event.length === 0) {
+            return res.status(404).json({ message: "Événement non trouvé." });
+        }
+        if (event[0].organizer_user_id !== userId) {
+            return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer cet événement." });
+        }
         const [result] = await db.query('DELETE FROM events WHERE id = ?', [id]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Événement non trouvé." });
