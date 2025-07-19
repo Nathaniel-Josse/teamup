@@ -39,7 +39,7 @@ exports.createProfile = async (req, res) => {
             availability
         } = req.body;
 
-        if (!LEVELS.includes(level) || !AVAILABILITIES.includes(availability)) {
+        if (!LEVELS.map(l => l.id).includes(level) || !AVAILABILITIES.map(a => a.id).includes(availability)) {
             return res.status(400).json({ error: 'Données incorrectes' });
         }
 
@@ -59,6 +59,9 @@ exports.createProfile = async (req, res) => {
              VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
             [user_id, fav_sport_id, first_name, last_name, birth_date, level, availability]
         );
+
+        // Add the profile ID to the user
+        await db.query('UPDATE users SET profile_id = ? WHERE id = ?', [result.insertId, user_id]);
 
         res.status(201).json({ id: result.insertId });
     } catch (err) {

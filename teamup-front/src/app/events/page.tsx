@@ -106,6 +106,12 @@ export default function Events() {
                     </button>
                     )
                 }
+                <button
+                    className="px-4 py-2 rounded mt-4"
+                    onClick={() => window.location.href = "/events/nearby"}
+                >
+                    Près de chez vous 🔍
+                </button>
                 {showForm && user && (
                     <div>
                         <AddOrUpdateEventComponent event={null} onUpdate={handleAddEvent} userId={user.id} />

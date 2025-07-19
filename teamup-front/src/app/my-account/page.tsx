@@ -56,7 +56,7 @@ export default function MyAccountMainPage() {
                 // CHECK 2 : Récupération du profil complet
 
                 await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profileId}`
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profile_id}`
                 ).then(async res => {
                     if (!res.ok) {
                         throw new Error("Erreur lors de la récupération du profil.");
@@ -148,6 +148,7 @@ export default function MyAccountMainPage() {
             if (res.ok) {
                 setProfile((prev: UserProfile | null) => prev ? { ...prev, ...updated } : prev);
                 setMessage("Profil mis à jour avec succès !");
+                window.location.reload();
             } else {
                 setMessage(data.message || "Erreur lors de la mise à jour du profil.");
             }

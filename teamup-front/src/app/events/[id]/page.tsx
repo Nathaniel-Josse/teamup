@@ -66,11 +66,19 @@ export default function EventPage({ params }: { params: { id: string } }) {
 
     const handleRegister = async () => {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/event/${event.organizer_user_id}/register`,
-            { method: "POST" }
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event.organizer_user_id}/register`,
+            { 
+                method: "POST",
+                body: JSON.stringify({ 
+                    eventId: id,
+                    userId: userId 
+                }),
+                headers: { "Content-Type": "application/json" }
+            }
         );
         if (res.ok) {
             alert("Inscription réussie !");
+            setIsRegistered(true);
         } else {
             alert("Échec de l'inscription.");
         }
@@ -83,6 +91,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
         );
         if (res.ok) {
             alert("Vous êtes désormais désinscrit de l'événement.");
+            setIsRegistered(false);
         } else {
             alert("Échec de la désinscription.");
         }
@@ -282,7 +291,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             </div>
                         ) : (
                             <div>
-                            {!isRegistered ? (
+                            {isRegistered ? (
                                 <div className="flex flex-col items-center">
                                     <button
                                         className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
@@ -297,7 +306,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                                         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                                         onClick={handleRegister}
                                     >
-                                        Inscription à l&apos;événement
+                                        S&apos;inscrire à l&apos;événement
                                     </button>
                                 </div>
                             )}

@@ -30,7 +30,7 @@ export default function SignUpComponent() {
             if (!res.ok) {
                 throw new Error("Erreur lors de l'inscription. Veuillez réessayer.");
             }
-            window.location.href = "/login";
+            window.location.href = "/auth/login";
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);

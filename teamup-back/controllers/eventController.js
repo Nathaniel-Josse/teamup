@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const path = require('path');
 const multer = require('multer');
+const geolib = require('geolib');
 
 // Multer setup for /uploads folder
 const storage = multer.diskStorage({
@@ -108,6 +109,17 @@ exports.getAllEvents = async (req, res) => {
                 });
             }
         });
+        // If the user provided lat and lon, we calculate the distance to each event
+        const { lat: userLat, lon: userLon } = req?.query;
+        if (userLat && userLon) {
+            const userLocation = { latitude: parseFloat(userLat), longitude: parseFloat(userLon) };
+            events.forEach(event => {
+                const eventLocation = { latitude: parseFloat(event.lat), longitude: parseFloat(event.lon) };
+                event.distance = geolib.getDistance(userLocation, eventLocation); // distance in meters
+            });
+            // Sort events by distance
+            events.sort((a, b) => a.distance - b.distance);
+        }
         res.json(events);
     } catch (err) {
         res.status(500).json({ message: 'Erreur de serveur.', error: err.message });
