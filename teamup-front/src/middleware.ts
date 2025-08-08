@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
     const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
+    const backendUploadsUrl = process.env.NEXT_PUBLIC_BACKEND_UPLOADS_URL || "http://localhost:3002";
     let cspHeader = '';
 
     if (process.env.NODE_ENV === 'development') {
@@ -12,7 +13,7 @@ export function middleware(request: NextRequest) {
         script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/ https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*;
         connect-src 'self' ${backendUrl} https://www.google.com https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@* https://{s}.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
         style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*;
-        img-src 'self' blob: data: https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@* https://{s}.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
+        img-src 'self' ${backendUploadsUrl} blob: data: https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@* https://{s}.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
         frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/;
         object-src 'none';
         base-uri 'self';
