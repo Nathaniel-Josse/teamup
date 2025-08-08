@@ -1,8 +1,12 @@
 "use client";
 import EventCardComponent from "@/components/events/eventCardComponent";
-import AddOrUpdateEventComponent from "@/components/events/addOrUpdateEventComponent";
 import { useEffect, useState } from "react";
 import { checkEventForm } from "@/helpers/checkForms";
+import dynamic from 'next/dynamic';
+
+const AddOrUpdateEventComponent = dynamic(() => import('@/components/events/addOrUpdateEventComponent'), {
+  ssr: false, // Disable server-side rendering for this component
+});
 
 export default function Events() {
     type UserInfo = {
@@ -56,9 +60,10 @@ export default function Events() {
 
     const handleAddEvent = async (form: any, pictureFile: File | null) => {
         if (checkEventForm(form) === true) {
-            // Prepare FormData if there's a picture file
             let requestBody: BodyInit;
             const headers: HeadersInit = {};
+            const csrfToken = await getCsrfToken();
+
             if (pictureFile) {
                 const formData = new FormData();
                 Object.entries(form).forEach(([key, value]) => {
@@ -72,19 +77,20 @@ export default function Events() {
                 headers["Content-Type"] = "application/json";
             }
 
-            console.log("Form data to be sent:", form);
+            // Always add the CSRF token header
+            headers["X-CSRF-Token"] = csrfToken;
 
             try {
                 await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`, {
                     method: 'POST',
                     headers,
                     body: requestBody,
+                    credentials: "include",
                 }).then((response) => {
                     if (!response.ok) {
                         throw new Error("Erreur lors de l'ajout de l'événement.");
                     }
                     alert("Événement ajouté avec succès !");
-                    // We redirect to the events page to see the new event
                     window.location.reload();
                 });
             } catch (err) {
@@ -92,6 +98,14 @@ export default function Events() {
             }
         }
     };
+
+    async function getCsrfToken() {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+            credentials: "include",
+        });
+        const data = await res.json();
+        return data.csrfToken;
+    }
 
     return (
         <main className="container mx-auto p-4 flex flex-col items-center">

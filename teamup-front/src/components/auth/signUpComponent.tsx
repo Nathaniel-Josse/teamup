@@ -3,6 +3,9 @@
 import { useState } from "react";
 import LogoComponent from "../logoComponent";
 
+// Import the Google reCAPTCHA component
+import ReCAPTCHA from "react-google-recaptcha";
+
 export default function SignUpComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -10,12 +13,18 @@ export default function SignUpComponent() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [authorized, setAuthorized] = useState(false);
+    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
     const isFormValid =
         email.trim() !== "" &&
         password.trim() !== "" &&
         subrole.trim() !== "" &&
-        authorized;
+        authorized &&
+        recaptchaToken;
+
+    const handleRecaptchaChange = (token: string | null) => {
+        setRecaptchaToken(token);
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -25,7 +34,7 @@ export default function SignUpComponent() {
             const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password, subrole }),
+                body: JSON.stringify({ email, password, subrole, recaptchaToken }),
             });
             if (!res.ok) {
                 throw new Error("Erreur lors de l'inscription. Veuillez réessayer.");
@@ -101,6 +110,12 @@ export default function SignUpComponent() {
                         <label htmlFor="authorize" className="text-sm text-black select-none">
                             J&apos;ai pris connaissance de la <a href="/privacy" className="text-blue-400 hover:underline font-semibold">politique de confidentialité</a> et des <a href="/terms" className="text-blue-400 hover:underline font-semibold">conditions d&apos;utilisation</a> de TeamUp et les accepte.
                         </label>
+                    </div>
+                    <div className="flex flex-col items-center mt-4">
+                        <ReCAPTCHA
+                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
+                            onChange={handleRecaptchaChange}
+                        />
                     </div>
                     <div className="flex flex-col items-center mt-4">
                         <button

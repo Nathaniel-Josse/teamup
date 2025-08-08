@@ -1,13 +1,20 @@
 "use client";
+
+import React from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import EventCardComponent from "@/components/events/eventCardComponent";
 import Spinner from "@/components/spinner";
-import AddOrUpdateEventComponent from "@/components/events/addOrUpdateEventComponent";
 import { checkEventForm } from "@/helpers/checkForms";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import dynamic from 'next/dynamic';
+
+const AddOrUpdateEventComponent = dynamic(() => import('@/components/events/addOrUpdateEventComponent'), {
+  ssr: false,
+});
+
+const ShowEventMapComponent = dynamic(() => import('@/components/events/showEventMapComponent'), {
+  ssr: false,
+});
 
 type Status = 'open' | 'closed' | 'done' | 'cancelled';
 
@@ -45,15 +52,17 @@ type Sport = {
     label: string;
 };
 
-const locationIcon = L.icon({
-    iconUrl: '/assets/images/location-sign.webp',
-    iconSize: [75, 75],
-    iconAnchor: [37, 75],
-    popupAnchor: [-3, -76]
-});
+// Add this helper to fetch the CSRF token
+async function getCsrfToken() {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+        credentials: "include",
+    });
+    const data = await res.json();
+    return data.csrfToken;
+}
 
 export default function EventPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+    const { id } = React.use(params);
     const [event, setEvent] = useState<Event | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [organizer, setOrganizer] = useState<Organizer | null>(null);
@@ -65,15 +74,20 @@ export default function EventPage({ params }: { params: { id: string } }) {
     const [showDeletePopup, setShowDeletePopup] = useState(false);
 
     const handleRegister = async () => {
+        const csrfToken = await getCsrfToken();
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event.organizer_user_id}/register`,
-            { 
+            {
                 method: "POST",
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     eventId: id,
-                    userId: userId 
+                    userId: userId,
                 }),
-                headers: { "Content-Type": "application/json" }
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                credentials: "include",
             }
         );
         if (res.ok) {
@@ -82,12 +96,20 @@ export default function EventPage({ params }: { params: { id: string } }) {
         } else {
             alert("Échec de l'inscription.");
         }
-    }
+    };
 
     const handleUnregister = async () => {
+        const csrfToken = await getCsrfToken();
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event.id}/users/${userId}/unregister`,
-            { method: "DELETE" }
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                credentials: "include",
+            }
         );
         if (res.ok) {
             alert("Vous êtes désormais désinscrit de l'événement.");
@@ -95,13 +117,13 @@ export default function EventPage({ params }: { params: { id: string } }) {
         } else {
             alert("Échec de la désinscription.");
         }
-    }
+    };
 
     const handleUpdateEvent = async (form: any, pictureFile: File | null) => {
         if (checkEventForm(form) === true) {
-            // Prepare FormData if there's a picture file
             let requestBody: BodyInit;
             const headers: HeadersInit = {};
+            const csrfToken = await getCsrfToken();
             const formData = new FormData();
             Object.entries(form).forEach(([key, value]) => {
                 formData.append(key, value as string | Blob);
@@ -114,6 +136,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                 requestBody = JSON.stringify(Object.fromEntries(formData));
                 headers["Content-Type"] = "application/json";
             }
+            headers["X-CSRF-Token"] = csrfToken;
 
             console.log("Form data to be sent:", form);
             try {
@@ -121,6 +144,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                     method: 'PUT',
                     headers,
                     body: requestBody,
+                    credentials: "include",
                 }).then((response) => {
                     if (!response.ok) {
                         throw new Error("Erreur lors de la mise à jour de l'événement.");
@@ -135,9 +159,15 @@ export default function EventPage({ params }: { params: { id: string } }) {
     };
 
     const handleDeleteEvent = async () => {
+        const csrfToken = await getCsrfToken();
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event.id}`, {
             method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
             body: JSON.stringify({ userId }),
+            credentials: "include",
         });
         if (res.ok) {
             alert("Événement supprimé avec succès.");
@@ -230,19 +260,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                         <p><span className="font-semibold">Organisateur :</span> {organizer ? organizer.first_name + " " + organizer.last_name : "Inconnu"}</p>
                         <p><span className="font-semibold">Sport :</span> {sport ? sport.label : event.sport_id}</p>
                         <div className="my-4">
-                            <MapContainer
-                                center={[event.lat, event.lon]}
-                                zoom={15}
-                                scrollWheelZoom={false}
-                                style={{ height: "250px", width: "100%" }}
-                                className="rounded z-0"
-                            >
-                                <TileLayer
-                                    attribution='&copy; OpenStreetMap contributors'
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                />
-                                <Marker position={[event.lat, event.lon]} icon={locationIcon} />
-                            </MapContainer>
+                            <ShowEventMapComponent event={event} />
                         </div>
                         <p><span className="font-semibold">Nombre max de participants :</span> {event.max_attendees}</p>
                         <p><span className="font-semibold">Description :</span> {event.description}</p>

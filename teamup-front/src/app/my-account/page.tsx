@@ -25,6 +25,15 @@ type UserProfile = {
     availability: 'weekday' | 'weekend' | 'both';
 };
 
+// Helper to fetch CSRF token
+async function getCsrfToken() {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+        credentials: "include",
+    });
+    const data = await res.json();
+    return data.csrfToken;
+}
+
 export default function MyAccountMainPage() {
     const [user, setUser] = useState<UserInfo | null>(null);
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -34,9 +43,7 @@ export default function MyAccountMainPage() {
 
     useEffect(() => {
         const getProfile = async (user: UserInfo) => {
-        
             // CHECK 1 : Est-ce que le profil de l'utilisateur existe ?
-
             if (!user) return;
             try {
                 const res = await fetch(
@@ -46,7 +53,7 @@ export default function MyAccountMainPage() {
                     throw new Error("Erreur lors de la récupération du profil.");
                 }
                 const data = await res.json();
-                
+
                 if (!data.exists) {
                     setNoProfile(true);
                     return;
@@ -54,7 +61,6 @@ export default function MyAccountMainPage() {
                 setNoProfile(false);
 
                 // CHECK 2 : Récupération du profil complet
-
                 await fetch(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profile_id}`
                 ).then(async res => {
@@ -71,7 +77,7 @@ export default function MyAccountMainPage() {
                 } else {
                     setMessage("Une erreur inconnue est survenue.");
                 }
-            } 
+            }
         }
 
         if (typeof window !== "undefined") {
@@ -91,12 +97,14 @@ export default function MyAccountMainPage() {
     const handleUserUpdate = async (updated: Partial<UserInfo>) => {
         if (!user) return;
         try {
+            const csrfToken = await getCsrfToken();
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${user.id}`,
                 {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken,
                     },
                     body: JSON.stringify(updated),
                 }
@@ -122,28 +130,31 @@ export default function MyAccountMainPage() {
     const handleProfileUpdate = async (updated: Partial<UserProfile>) => {
         if (!user) return;
         try {
-            const res = profile?.id ? 
-            await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${profile.id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(updated),
-                }
-            ) :
-            await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ user_id: user.id, ...updated }),
-                }
-            ); 
-            
+            const csrfToken = await getCsrfToken();
+            const res = profile?.id ?
+                await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${profile.id}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-Token": csrfToken,
+                        },
+                        body: JSON.stringify(updated),
+                    }
+                ) :
+                await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-Token": csrfToken,
+                        },
+                        body: JSON.stringify({ user_id: user.id, ...updated }),
+                    }
+                );
+
             const data = await res.json();
             if (res.ok) {
                 setProfile((prev: UserProfile | null) => prev ? { ...prev, ...updated } : prev);

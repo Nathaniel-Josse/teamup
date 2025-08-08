@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const csrf = require('csurf');
 
 dotenv.config();
 
@@ -16,6 +17,14 @@ app.use(cors({
     credentials: true
 }));
 
+// CSRF protection middleware (use after bodyParser and cors)
+const csrfProtection = csrf({ cookie: false });
+
+// Example route to get CSRF token (frontend should call this to get the token)
+app.get('/api/csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
+
 // Imports
 const userController = require('./controllers/userController');
 const profileController = require('./controllers/profileController');
@@ -24,31 +33,36 @@ const eventController = require('./controllers/eventController');
 const userEventController = require('./controllers/userEventController');
 
 // Routes
+
+// Public routes (no CSRF needed)
 app.post('/api/signup', userController.signup);
 app.post('/api/login', userController.login);
-app.put('/api/users/:id', userController.updateUser);
+
+// Protected routes (CSRF needed)
+app.put('/api/users/:id', csrfProtection, userController.updateUser);
+app.post('/api/profiles', csrfProtection, profileController.createProfile);
+app.put('/api/profiles/:id', csrfProtection, profileController.updateProfile);
+app.delete('/api/profiles/:id', csrfProtection, profileController.deleteProfile);
+
+app.post('/api/sports', csrfProtection, sportController.createSport);
+app.delete('/api/sports/:id', csrfProtection, sportController.deleteSport);
+
+app.post('/api/events', csrfProtection, eventController.uploadEventPicture, eventController.createEvent);
+app.put('/api/events/:id', csrfProtection, eventController.uploadEventPicture, eventController.updateEvent);
+app.delete('/api/events/:id', csrfProtection, eventController.deleteEvent);
+
+app.post('/api/events/:eventId/register', csrfProtection, userEventController.registerForEvent);
+app.delete('/api/events/:eventId/users/:userId/unregister', csrfProtection, userEventController.unregisterFromEvent);
+
+// Read-only routes (no CSRF needed)
 app.get('/api/users/:id', userController.getUserById);
-
-app.post('/api/profiles', profileController.createProfile);
 app.get('/api/profiles/:id', profileController.getProfileById);
-app.put('/api/profiles/:id', profileController.updateProfile);
-app.delete('/api/profiles/:id', profileController.deleteProfile);
 app.get('/api/profiles/user/:userId', profileController.profileExistsByUserId);
-
-app.post('/api/sports', sportController.createSport);
 app.get('/api/sports', sportController.getAllSports);
 app.get('/api/sports/:id', sportController.getSportById);
-app.delete('/api/sports/:id', sportController.deleteSport);
-
-app.post('/api/events', eventController.uploadEventPicture, eventController.createEvent);
 app.get('/api/events', eventController.getAllEvents);
 app.get('/api/events/:id', eventController.getEventById);
-app.put('/api/events/:id', eventController.uploadEventPicture, eventController.updateEvent);
-app.delete('/api/events/:id', eventController.deleteEvent);
-
-app.post('/api/events/:eventId/register', userEventController.registerForEvent);
 app.get('/api/events/:eventId/users/:userId/registered', userEventController.isUserRegisteredForEvent);
-app.delete('/api/events/:eventId/users/:userId/unregister', userEventController.unregisterFromEvent);
 
 app.get('/', (req, res) => {
     res.send('Eh mais, ne serait-ce pas le backend de TeamUp ?');

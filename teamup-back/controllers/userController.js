@@ -3,18 +3,42 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const dotenv = require('dotenv');
+const axios = require('axios');
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default';
 
 // Inscription
 exports.signup = async (req, res) => {
-    const { email, password, subrole } = req.body;
+    const { email, password, subrole, recaptchaToken } = req.body;
     const role = 'user'; // Par défaut, le rôle est 'user'
     if (!email || !password) {
         return res.status(400).json({ message: 'Champs manquants' });
     }
+    // Vérification reCAPTCHA
+    if (!recaptchaToken) {
+        return res.status(400).json({ message: "reCAPTCHA manquant." });
+    }
     try {
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+        const verifyUrl = process.env.RECAPTCHA_VERIFY_URL;
+
+        const verifyResponse = await axios.post(
+            verifyUrl,
+            new URLSearchParams({
+                secret: recaptchaSecret,
+                response: recaptchaToken,
+                ...(recaptchaTarget ? { remoteip: recaptchaTarget } : {})
+            }).toString(),
+            {
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            }
+        );
+
+        if (!verifyResponse.data.success) {
+            return res.status(400).json({ message: "Échec de la vérification reCAPTCHA." });
+        }
+
         // On vérifie si l'email est déjà utilisé / si l'utilisateur existe déjà
         const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
         if (existing.length > 0) {
