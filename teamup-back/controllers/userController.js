@@ -28,7 +28,7 @@ exports.signup = async (req, res) => {
             new URLSearchParams({
                 secret: recaptchaSecret,
                 response: recaptchaToken,
-                ...(recaptchaTarget ? { remoteip: recaptchaTarget } : {})
+                ...(verifyUrl ? { remoteip: verifyUrl } : {})
             }).toString(),
             {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" }

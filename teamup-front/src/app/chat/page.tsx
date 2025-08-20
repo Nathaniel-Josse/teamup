@@ -1,5 +1,7 @@
 'use client';
+
 import { useEffect, useState } from "react";
+import ChatComponent from "@/components/chat/chatComponent";
 
 export default function Chat() {
 
@@ -24,9 +26,9 @@ export default function Chat() {
     }, []);
 
     return (
-        <main>
-            <h1>Chat Page</h1>
-            <p>ça va arriver...j&apos;espère</p>
+        <main className="container mx-auto p-4 flex flex-col items-center">
+            <h1 className="text-2xl font-bold mb-6">Chat</h1>
+            <ChatComponent />
         </main>
     );
 }

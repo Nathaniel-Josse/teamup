@@ -72,3 +72,8 @@ button {
 .nav-background {
   background: var(--button-primary);
 }
+
+/* temp */
+.bg-button-primary {
+  background: var(--button-primary);
+}

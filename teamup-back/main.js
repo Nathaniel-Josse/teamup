@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const csrf = require('csurf');
 
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -18,11 +20,15 @@ app.use(cors({
 }));
 
 // CSRF protection middleware (use after bodyParser and cors)
-const csrfProtection = csrf({ cookie: false });
+const csrfProtection = csrf({
+    cookie: true
+});
 
-// Example route to get CSRF token (frontend should call this to get the token)
+// Route to get CSRF token (frontend should call this to get the token)
 app.get('/api/csrf-token', csrfProtection, (req, res) => {
-    res.json({ csrfToken: req.csrfToken() });
+    const csrfToken = req.csrfToken();
+    console.log("CSRF token generated:", csrfToken);
+    res.json({ csrfToken });
 });
 
 // Imports
@@ -31,6 +37,7 @@ const profileController = require('./controllers/profileController');
 const sportController = require('./controllers/sportsController');
 const eventController = require('./controllers/eventController');
 const userEventController = require('./controllers/userEventController');
+const chatController = require('./controllers/chatController');
 
 // Routes
 
@@ -54,6 +61,16 @@ app.delete('/api/events/:id', csrfProtection, eventController.deleteEvent);
 app.post('/api/events/:eventId/register', csrfProtection, userEventController.registerForEvent);
 app.delete('/api/events/:eventId/users/:userId/unregister', csrfProtection, userEventController.unregisterFromEvent);
 
+app.post('/api/chat/rooms', csrfProtection, chatController.createChatRoom);
+app.put('/api/chat/rooms/:id', csrfProtection, chatController.updateChatRoom);
+app.delete('/api/chat/rooms/:id', csrfProtection, chatController.deleteChatRoom);
+
+app.post('/api/chat/rooms/:roomId/messages', csrfProtection, chatController.createMessage);
+app.delete('/api/chat/rooms/:roomId/messages/:messageId', csrfProtection, chatController.deleteMessage);
+
+app.post('/api/chat/rooms/:roomId/members', csrfProtection, chatController.addRoomMember);
+app.delete('/api/chat/rooms/:roomId/members/:userId', csrfProtection, chatController.removeRoomMember);
+
 // Read-only routes (no CSRF needed)
 app.get('/api/users/:id', userController.getUserById);
 app.get('/api/profiles/:id', profileController.getProfileById);
@@ -63,6 +80,11 @@ app.get('/api/sports/:id', sportController.getSportById);
 app.get('/api/events', eventController.getAllEvents);
 app.get('/api/events/:id', eventController.getEventById);
 app.get('/api/events/:eventId/users/:userId/registered', userEventController.isUserRegisteredForEvent);
+app.get('/api/chat/rooms', chatController.getChatRooms);
+app.get('/api/chat/rooms/:id', chatController.getChatRoomById);
+app.get('/api/chat/rooms/:roomId/messages', chatController.getMessagesByRoom);
+app.get('/api/chat/rooms/:roomId/members', chatController.getRoomMembers);
+app.get('/api/chat/rooms/user/:userId', chatController.getRoomsForUser);
 
 app.get('/', (req, res) => {
     res.send('Eh mais, ne serait-ce pas le backend de TeamUp ?');

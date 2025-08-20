@@ -6,12 +6,15 @@
   "scripts": {
     "start": "node main.js",
     "dev": "nodemon main.js",
-    "promote-admin": "node promoteAdmin.js"
+    "promote-admin": "node promoteAdmin.js",
+    "upload": "node uploadServer.js",
+    "chat": "node chatServer.js"
   },
   "dependencies": {
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
     "dayjs": "^1.11.13",
@@ -23,6 +26,7 @@
     "mysql2": "^3.14.1",
     "next": "^15.4.1",
     "nodemon": "^3.1.10",
+    "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
   }
 }
