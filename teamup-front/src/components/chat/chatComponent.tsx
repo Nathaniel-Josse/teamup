@@ -16,6 +16,7 @@ const ChatComponent: React.FC = () => {
     const [showSidebar, setShowSidebar] = useState(false);
     const socketRef = useRef<Socket | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const currentRoomRef = useRef<string | null>(null);
 
     const userToken = typeof window !== "undefined" ? localStorage.getItem('token') : null;
     const [hasProfile, setHasProfile] = useState<boolean>(true); // default true for loading
@@ -72,32 +73,27 @@ const ChatComponent: React.FC = () => {
 
     // This useEffect handles the socket connection and new message listeners
     useEffect(() => {
-        if (!userToken || !selectedRoomId) return;
+        if (!userToken) return;
 
-        const connectSocket = () => {
-            const newSocket = socketInstance(SOCKET_SERVER_URL, {
-                auth: { token: userToken },
-                transports: ['websocket'],
-            });
+        const newSocket = io(SOCKET_SERVER_URL, {
+            auth: { token: userToken },
+            transports: ['websocket'],
+        });
 
-            newSocket.on('connect', () => {
-                console.log('Successfully connected to the socket server');
-            });
+        newSocket.on('connect', () => {
+            console.log('Successfully connected to the socket server');
+        });
 
-            newSocket.on('new_message', (message) => {
-                setMessages(prevMessages => [...prevMessages, message]);
-            });
+        newSocket.on('new_message', (message) => {
+            console.log("New message received:", message);
+            setMessages(prevMessages => [...prevMessages, message]);
+        });
 
-            newSocket.on('disconnect', () => {
-                console.log('Disconnected from socket server');
-            });
+        newSocket.on('disconnect', () => {
+            console.log('Disconnected from socket server');
+        });
 
-            socketRef.current = newSocket;
-        };
-
-        if (!socketRef.current) {
-            connectSocket();
-        }
+        socketRef.current = newSocket;
 
         return () => {
             if (socketRef.current) {
@@ -105,14 +101,31 @@ const ChatComponent: React.FC = () => {
                 socketRef.current = null;
             }
         };
-    }, [userToken, selectedRoomId]);
+    }, [userToken]); // Dependency only on userToken
 
     // This useEffect handles fetching messages for the selected room
     useEffect(() => {
         const fetchMessages = async () => {
-            if (!selectedRoomId) return;
+            if (!socketRef.current || !selectedRoomId) return;
+
+            // Check if the user is switching to a different room
+            if (currentRoomRef.current !== selectedRoomId) {
+                console.log(`Switching from room ${currentRoomRef.current} to ${selectedRoomId}`);
+
+                // 1. Leave the old room on the backend
+                if (currentRoomRef.current) {
+                    socketRef.current.emit('leave_room', currentRoomRef.current);
+                }
+
+                // 2. Join the new room on the backend
+                socketRef.current.emit('join_room', selectedRoomId);
+                
+                // 3. Update the ref with the new room ID
+                currentRoomRef.current = selectedRoomId;
+            }
+
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/messages`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/messages?timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch messages');
                 }
@@ -124,6 +137,7 @@ const ChatComponent: React.FC = () => {
         };
 
         fetchMessages();
+
     }, [selectedRoomId]);
 
     // This useEffect handles the room change logic
@@ -142,7 +156,8 @@ const ChatComponent: React.FC = () => {
 
     const sendMessage = () => {
         if (input.trim() && socketRef.current && selectedRoomId) {
-            socketRef.current.emit('send_message', { roomId: selectedRoomId, content: input });
+            socketRef.current.emit('send_message', { roomId: selectedRoomId, userId: getUserIdFromToken(userToken), content: input, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+            console.log("Message sent:", input);
             setInput('');
         }
     };
@@ -304,7 +319,7 @@ const ChatComponent: React.FC = () => {
                     ) : (
                         messages.map((msg: any, idx) => (
                             <div key={idx} className="mb-2 text-gray-800">
-                                <strong>{msg.username}:</strong> {msg.content}
+                                <i className="text-gray-500">{msg.created_at} </i><strong>{msg.first_name} {msg.last_name}:</strong> {msg.content}
                             </div>
                         ))
                     )}

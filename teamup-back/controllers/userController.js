@@ -75,7 +75,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { id: user.id, role: user.role, subrole: user.subrole },
             JWT_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '7d' }
         );
         console.log(`User ${user.email} logged in successfully with role ${user.role} and subrole ${user.subrole}`);
         res.json({ 

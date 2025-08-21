@@ -162,3 +162,16 @@ exports.profileExistsByUserId = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.getProfileByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const [rows] = await db.query('SELECT * FROM profiles WHERE user_id = ?', [userId]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+        if (res) res.json(rows[0]);
+        return rows[0];
+    } catch (err) {
+        console.error('Error fetching profile by user ID:', err);
+        res?.status(500).json({ error: err.message });
+    }
+};

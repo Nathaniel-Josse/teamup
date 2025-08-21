@@ -1,7 +1,6 @@
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
-
-export const verifyUserToken = async function (token) {
+export const verifyUserToken = async function (token, jwt) {
+    const JWT_SECRET = process.env.JWT_SECRET;
+    
     if (!token) {
         return null;
     }

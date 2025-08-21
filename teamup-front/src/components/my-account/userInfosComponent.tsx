@@ -31,6 +31,12 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
         onUpdate({ [field]: editValues[field] });
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.reload();
+    };
+
     const handleCopyId = () => {
         if (user?.id) {
             navigator.clipboard.writeText(user.id);
@@ -124,6 +130,15 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
                     onClick={() => handleUpdate("subrole")}
                 >
                     Mettre à jour le rôle
+                </button>
+            </div>
+            <hr className="text-gray-300"></hr>
+            <div className="flex items-center justify-center space-x-4">
+                <button
+                    className="px-3 py-1 rounded bg-red-500 text-white"
+                    onClick={handleLogout}
+                >
+                    Se déconnecter
                 </button>
             </div>
         </div>

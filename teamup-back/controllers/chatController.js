@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { formatDateFromDB } = require('../helpers/formatDateFromDB');
 
 // CHAT ROOMS CRUD
 exports.createChatRoom = async (req, res) => {
@@ -90,6 +91,20 @@ exports.getRoomMembers = async (req, res) => {
     }
 };
 
+exports.getRoomMemberIdByUserId = async (req, res) => {
+    const { user_id, room_id } = req.params;
+    try {
+        const [rows] = await db.query('SELECT id FROM room_members WHERE user_id = ? AND room_id = ?', [user_id, room_id]);
+        if (rows.length === 0) return res?.status(404).json({ error: 'Not found' });
+        if (res) {
+            res.json(rows[0]);
+        }
+        return rows[0].id;
+    } catch (err) {
+        res?.status(500).json({ error: err.message });
+    }
+};
+
 exports.removeRoomMember = async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM room_members WHERE id = ?', [req.params.id]);
@@ -103,23 +118,32 @@ exports.removeRoomMember = async (req, res) => {
 
 // MESSAGES CRUD
 exports.createMessage = async (req, res) => {
-    const { room_member_id, content } = req.body;
-    if (content.length > 1000) return res.status(400).json({ error: 'Content too long' });
+    const { roomMemberId, content } = req.body;
+    console.log("Creating message with req:", req.body);
+    if (content.length > 1000) return res?.status(400).json({ error: 'Content too long' });
+    console.log("a");
     try {
         const [result] = await db.query(
             'INSERT INTO messages (room_member_id, content) VALUES (?, ?)',
-            [room_member_id, content]
+            [roomMemberId, content]
         );
+        console.log("b: ", result);
         const messageId = result.insertId;
         const [rows] = await db.query('SELECT * FROM messages WHERE id = ?', [messageId]);
-        res.status(201).json(rows[0]);
+        console.log("c: ", rows);
+        if (res) {
+            res.status(201).json(rows[0]);
+        }
+        return rows[0];
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error creating message:', err);
+        res?.status(500).json({ error: err.message });
     }
 };
 
 exports.getMessagesByRoom = async (req, res) => {
     const roomId = req.params.roomId;
+    const timezone = req.query.timezone;
 
     if (!roomId) {
         return res.status(400).json({ message: 'Room ID is required.' });
@@ -131,7 +155,6 @@ exports.getMessagesByRoom = async (req, res) => {
                 m.id,
                 m.content,
                 m.created_at,
-                u.id AS user_id,
                 p.first_name,
                 p.last_name,
                 rm.room_id
@@ -150,6 +173,9 @@ exports.getMessagesByRoom = async (req, res) => {
             LIMIT 100
         `;
         const [rows] = await db.query(query, [roomId]);
+        rows.forEach(element => {
+            element.created_at = formatDateFromDB(element.created_at, timezone);
+        });
         res.status(200).json(rows);
     } catch (error) {
         console.error('Database query error:', error);
@@ -176,5 +202,8 @@ exports.getRoomsForUser = async (req, res) => {
         'SELECT room_id, name FROM room_members JOIN chat_rooms ON room_members.room_id = chat_rooms.id WHERE user_id = ?',
         [userId]
     );
-    return res.json(rows);
+    if(res) {
+        return res.json(rows);
+    }
+    return rows;
 }
