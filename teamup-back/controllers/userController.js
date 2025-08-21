@@ -8,14 +8,13 @@ dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default';
 
-// Inscription
 exports.signup = async (req, res) => {
     const { email, password, subrole, recaptchaToken } = req.body;
-    const role = 'user'; // Par défaut, le rôle est 'user'
+    const role = 'user'; // By default, all users are 'user' role
     if (!email || !password) {
         return res.status(400).json({ message: 'Champs manquants' });
     }
-    // Vérification reCAPTCHA
+    // reCAPTCHA check
     if (!recaptchaToken) {
         return res.status(400).json({ message: "reCAPTCHA manquant." });
     }
@@ -39,7 +38,7 @@ exports.signup = async (req, res) => {
             return res.status(400).json({ message: "Échec de la vérification reCAPTCHA." });
         }
 
-        // On vérifie si l'email est déjà utilisé / si l'utilisateur existe déjà
+        // Check if the email is already in use / if the user already exists
         const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
         if (existing.length > 0) {
             return res.status(409).json({ message: 'Email déjà utilisé' });
@@ -56,7 +55,6 @@ exports.signup = async (req, res) => {
     }
 };
 
-// Connexion
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -89,7 +87,6 @@ exports.login = async (req, res) => {
     }
 };
 
-// Met à jour les informations d'un utilisateur
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
     const { email, password, subrole } = req.body;
@@ -97,7 +94,6 @@ exports.updateUser = async (req, res) => {
         return res.status(400).json({ message: "ID utilisateur manquant." });
     }
     try {
-        // Prépare la requête dynamique selon les champs fournis
         const fields = [];
         const values = [];
         if (email) {
@@ -124,7 +120,6 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// Récupère un utilisateur par son ID
 exports.getUserById = async (req, res) => {
     const { id } = req.params;
     if (!id) {

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import LogoComponent from "../logoComponent";
 
-// Import the Google reCAPTCHA component
 import ReCAPTCHA from "react-google-recaptcha";
 
 export default function SignUpComponent() {

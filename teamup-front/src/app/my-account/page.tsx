@@ -43,7 +43,7 @@ export default function MyAccountMainPage() {
 
     useEffect(() => {
         const getProfile = async (user: UserInfo) => {
-            // CHECK 1 : Est-ce que le profil de l'utilisateur existe ?
+            // CHECK 1 : does the user's profile exist?
             if (!user) return;
             try {
                 const res = await fetch(
@@ -60,7 +60,7 @@ export default function MyAccountMainPage() {
                 }
                 setNoProfile(false);
 
-                // CHECK 2 : Récupération du profil complet
+                // CHECK 2 : Fetch complete profile
                 await fetch(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profile_id}`
                 ).then(async res => {

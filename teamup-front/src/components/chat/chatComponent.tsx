@@ -13,6 +13,9 @@ const ChatComponent: React.FC = () => {
     const [rooms, setRooms] = useState([]);
     const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
     const [showSidebar, setShowSidebar] = useState(false);
+    const [showMembersPopup, setShowMembersPopup] = useState(false);
+    const [roomMembers, setRoomMembers] = useState([]);
+    const [newMemberId, setNewMemberId] = useState('');
     const socketRef = useRef<Socket | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const currentRoomRef = useRef<string | null>(null);
@@ -166,6 +169,61 @@ const ChatComponent: React.FC = () => {
         setShowSidebar(false);
     };
 
+    const fetchRoomMembers = async () => {
+        if (!selectedRoomId) return;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/members`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch room members');
+            }
+            const data = await response.json();
+            setRoomMembers(data);
+            setShowMembersPopup(true);
+        } catch (error) {
+            console.error("Error fetching room members:", error);
+        }
+    };
+
+    const handleAddMember = async () => {
+        if (!selectedRoomId || !newMemberId.trim()) {
+            alert("Veuillez entrer un ID d'utilisateur.");
+            return;
+        }
+
+        const csrfToken = await getCsrfToken();
+        if (!csrfToken) {
+            alert("Erreur: Impossible d'obtenir le token de sécurité.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                    'x-csrf-token': csrfToken
+                },
+                body: JSON.stringify({ user_id: newMemberId, room_id: selectedRoomId }),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Échec de l\'ajout du membre.');
+            }
+
+            // On success, refresh the member list and clear the input
+            await fetchRoomMembers(); // Re-fetch to update the list in the popup
+            setNewMemberId('');
+            alert("Membre ajouté avec succès !");
+
+        } catch (error) {
+            console.error("Erreur lors de l'ajout du membre:", error);
+            alert(`Erreur: ${error.message}`);
+        }
+    };
+
     const handleCreateRoom = async () => {
         const newRoomName = prompt("Entrez le nom du nouveau salon :");
         if (!newRoomName) return;
@@ -230,7 +288,7 @@ const ChatComponent: React.FC = () => {
     }
 
     return (
-        <div className="relative flex h-[80vh] max-w-4xl mx-auto bg-white rounded shadow border border-gray-300 overflow-hidden">
+        <div className="relative flex h-[80vh] max-w-2xl mx-auto bg-white rounded shadow border border-gray-300 overflow-hidden">
             {/* Burger menu for mobile */}
             <div className="md:hidden absolute left-2 top-2 z-20">
                 <button
@@ -250,7 +308,7 @@ const ChatComponent: React.FC = () => {
                     {rooms.map((room) => (
                         <p
                             key={room.room_id}
-                            className={`text-left px-4 py-3 transition ${selectedRoomId === room.room_id ? 'bg-button-primary font-semibold' : 'text-black hover:bg-blue-100'}`}
+                            className={`text-left px-4 py-3 transition hover:cursor-pointer ${selectedRoomId === room.room_id ? 'bg-button-primary font-semibold' : 'text-black hover:bg-blue-100'}`}
                             onClick={() => handleRoomChange(room.room_id)}
                         >
                             {room.name}
@@ -289,7 +347,7 @@ const ChatComponent: React.FC = () => {
                             {rooms.map((room) => (
                                 <p
                                     key={room.room_id}
-                                    className={`text-left px-4 py-3 transition ${selectedRoomId === room.room_id ? 'bg-button-primary font-semibold' : 'text-black hover:bg-blue-100'}`}
+                                    className={`text-left px-4 py-3 transition hover:cursor-pointer ${selectedRoomId === room.room_id ? 'bg-button-primary font-semibold' : 'text-black hover:bg-blue-100'}`}
                                     onClick={() => { handleRoomChange(room.room_id); setShowSidebar(false); }}
                                 >
                                     {room.name}
@@ -309,15 +367,26 @@ const ChatComponent: React.FC = () => {
             )}
             {/* Chat area */}
             <div className="flex-1 flex flex-col">
-                <div className="border-b border-gray-300 px-4 py-3 bg-gray-50 font-semibold text-lg text-black ml-15">
+                <div className="border-b border-gray-300 px-4 py-3 bg-gray-50 font-semibold text-lg text-black max-md:ml-15 flex justify-between items-center">
                     {rooms.find(r => r.room_id === selectedRoomId)?.name || 'Salon de discussion'}
+                    {selectedRoomId && (
+                        <button
+                            onClick={fetchRoomMembers}
+                            className="ml-2 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
+                            aria-label="Afficher les membres"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.93 0 3.5 1.57 3.5 3.5S13.93 12 12 12 8.5 10.43 8.5 8.5 10.07 5 12 5zm0 14.9c-2.97 0-6.15-1.78-8.24-5.32C4.16 13.56 7.02 11.5 12 11.5s7.84 2.06 8.24 4.08c-2.09 3.54-5.27 5.32-8.24 5.32z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                    )}
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                     {messages.length === 0 ? (
                         <div className="text-gray-400 text-center mt-10">Aucun message dans ce salon...pour le moment !</div>
                     ) : (
                         messages.map((msg: any, idx) => (
-                            <div key={idx} className="mb-2 text-gray-800">
+                            <div key={idx} className="mb-2 text-gray-800 break-all">
                                 <i className="text-gray-500">{msg.created_at} </i><strong>{msg.first_name} {msg.last_name}:</strong> {msg.content}
                             </div>
                         ))
@@ -341,6 +410,53 @@ const ChatComponent: React.FC = () => {
                     </button>
                 </div>
             </div>
+            {showMembersPopup && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-xl p-6 w-80">
+                        <div className="flex justify-between items-center border-b pb-3 mb-3">
+                            <h3 className="text-xl font-semibold text-black">Membres du salon</h3>
+                            <button
+                                onClick={() => setShowMembersPopup(false)}
+                                className="text-gray-500 hover:text-gray-700 transition rounded"
+                                aria-label="Fermer"
+                            >
+                                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path d="M6 6l12 12M6 18L18 6" />
+                                </svg>
+                            </button>
+                        </div>
+                        {roomMembers.length > 0 ? (
+                            <ul>
+                                {roomMembers.map((member: any) => (
+                                    <li key={member.id} className="text-gray-800 py-1">
+                                        - {member.first_name} {member.last_name}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-gray-500 text-sm">Aucun membre trouvé.</p>
+                        )}
+                        <div className="mt-4 pt-4 border-t border-gray-300">
+                            <h4 className="font-semibold text-gray-800 mb-2">Ajouter un membre</h4>
+                            <div className="flex">
+                                <input
+                                    type="text"
+                                    placeholder="ID de l'utilisateur"
+                                    value={newMemberId}
+                                    onChange={(e) => setNewMemberId(e.target.value)}
+                                    className="flex-1 mr-2 px-2 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-black"
+                                />
+                                <button
+                                    onClick={handleAddMember} // This function will be created next
+                                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                                >
+                                    Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

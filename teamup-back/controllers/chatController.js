@@ -75,7 +75,7 @@ exports.addRoomMember = async (req, res) => {
             [room_id, user_id]
         );
         const memberId = result.insertId;
-        const [rows] = await db.query('SELECT * FROM room_members WHERE id = ?', [memberId]);
+        const [rows] = await db.query(`SELECT * FROM room_members WHERE id = ?`, [memberId]);
         res.status(201).json(rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -84,7 +84,15 @@ exports.addRoomMember = async (req, res) => {
 
 exports.getRoomMembers = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM room_members WHERE room_id = ?', [req.params.room_id]);
+        const [rows] = await db.query(`
+            SELECT
+              room_members.id,
+              profiles.first_name,
+              profiles.last_name
+            FROM room_members
+            JOIN users ON room_members.user_id = users.id
+            JOIN profiles ON users.id = profiles.user_id
+            WHERE room_members.room_id = ?`, [req.params.roomId]);
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });

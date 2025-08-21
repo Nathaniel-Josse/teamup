@@ -52,7 +52,7 @@ type Sport = {
     label: string;
 };
 
-// Add this helper to fetch the CSRF token
+// Helper to fetch the CSRF token
 async function getCsrfToken() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
         credentials: "include",
@@ -101,7 +101,11 @@ export default function EventPage({ params }: { params: { id: string } }) {
         const fetchEvent = async () => {
             console.log("Fetching event with ID:", id);
             const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${id}`);
-            if (!res.ok) return;
+            if (!res.ok) {
+                console.error("Erreur lors de la récupération de l'événement:", res.statusText);
+                window.location.href = "/not-found";
+                return;
+            }
             const data = await res.json();
             setEvent(data);
 

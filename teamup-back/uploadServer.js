@@ -11,10 +11,8 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
 
-  // ✅ Serve the uploads folder statically
   server.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // Handle everything else with Next.js
   server.all('', (req, res) => {
     return handle(req, res);
   });

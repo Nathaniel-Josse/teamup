@@ -1,13 +1,12 @@
 const db = require('../config/db');
 
-// Inscription d'un utilisateur à un événement
 exports.registerForEvent = async (req, res) => {
     const { userId, eventId } = req.body;
     if (!userId || !eventId) {
         return res.status(400).json({ message: 'Champs manquants' });
     }
     try {
-        // Vérifie si l'utilisateur est déjà inscrit à l'événement
+        // Check if the user is already registered for the event
         const [existing] = await db.query('SELECT * FROM user_event WHERE user_id = ? AND event_id = ?', [userId, eventId]);
         if (existing.length > 0) {
             return res.status(409).json({ message: 'Utilisateur déjà inscrit à cet événement' });
@@ -36,14 +35,13 @@ exports.isUserRegisteredForEvent = async (req, res) => {
     }
 }
 
-// Désinscription d'un utilisateur d'un événement
 exports.unregisterFromEvent = async (req, res) => {
     const { userId, eventId } = req.params;
     if (!userId || !eventId) {
         return res.status(400).json({ message: 'Champs manquants' });
     }
     try {
-        // Vérifie si l'utilisateur est inscrit à l'événement
+        // Check if the user is registered for the event
         const [existing] = await db.query('SELECT * FROM user_event WHERE user_id = ? AND event_id = ?', [userId, eventId]);
         if (existing.length === 0) {
             return res.status(404).json({ message: 'Inscription non trouvée' });
@@ -68,7 +66,6 @@ exports.getAllUsersRegisteredForEvent = async (req, res) => {
         const [registrations] = await db.query(`
             SELECT
                 user_event.id AS registration_id,
-                user_event.user_id,
                 users.email,
                 profiles.first_name,
                 profiles.last_name,

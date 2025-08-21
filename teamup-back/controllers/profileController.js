@@ -26,7 +26,6 @@ const AVAILABILITIES = [
 
 /* CRUD */
 
-// CREATE
 exports.createProfile = async (req, res) => {
     try {
         const {
@@ -69,7 +68,6 @@ exports.createProfile = async (req, res) => {
     }
 };
 
-// READ ONE
 exports.getProfileById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -94,7 +92,6 @@ exports.getProfileById = async (req, res) => {
     }
 };
 
-// UPDATE
 exports.updateProfile = async (req, res) => {
     try {
         const { id } = req.params;
@@ -134,7 +131,6 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// DELETE
 exports.deleteProfile = async (req, res) => {
     try {
         const { id } = req.params;
@@ -148,7 +144,7 @@ exports.deleteProfile = async (req, res) => {
 
 /* END OF MAIN CRUD FUNCTIONS */
 
-// CHECK IF PROFILE EXISTS BY USER_ID
+// Check if profile exists by user ID
 exports.profileExistsByUserId = async (req, res) => {
     try {
         const { userId } = req.params;

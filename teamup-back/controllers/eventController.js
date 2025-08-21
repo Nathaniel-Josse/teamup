@@ -241,16 +241,21 @@ exports.deleteEvent = async (req, res) => {
     }
     try {
         const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
+
         if (event.length === 0) {
             return res.status(404).json({ message: "Événement non trouvé." });
         }
         if (event[0].organizer_user_id !== userId) {
             return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer cet événement." });
         }
+
         const [result] = await db.query('DELETE FROM events WHERE id = ?', [id]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Événement non trouvé." });
         }
+
+        await db.query('DELETE FROM user_event WHERE event_id = ?', [id]);
+        
         res.json({ message: "Événement supprimé." });
     } catch (err) {
         res.status(500).json({ message: "Erreur de serveur.", error: err.message });

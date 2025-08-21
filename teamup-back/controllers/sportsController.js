@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// Create a new sport
 exports.createSport = async (req, res) => {
     try {
         const { label } = req.body;
@@ -15,7 +14,6 @@ exports.createSport = async (req, res) => {
     }
 };
 
-// Get all sports
 exports.getAllSports = async (req, res) => {
     try {
         const [sports] = await db.execute('SELECT * FROM sports ORDER BY label ASC');
@@ -25,7 +23,6 @@ exports.getAllSports = async (req, res) => {
     }
 };
 
-// Get a single sport by id
 exports.getSportById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -39,7 +36,6 @@ exports.getSportById = async (req, res) => {
     }
 };
 
-// Delete a sport by id
 exports.deleteSport = async (req, res) => {
     try {
         const { id } = req.params;
