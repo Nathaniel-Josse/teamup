@@ -80,6 +80,7 @@ app.get('/api/sports/:id', sportController.getSportById);
 app.get('/api/events', eventController.getAllEvents);
 app.get('/api/events/:id', eventController.getEventById);
 app.get('/api/events/:eventId/users/:userId/registered', userEventController.isUserRegisteredForEvent);
+app.get('/api/events/:eventId/users/:userId/all', userEventController.getAllUsersRegisteredForEvent);
 app.get('/api/chat/rooms', chatController.getChatRooms);
 app.get('/api/chat/rooms/:id', chatController.getChatRoomById);
 app.get('/api/chat/rooms/:roomId/messages', chatController.getMessagesByRoom);

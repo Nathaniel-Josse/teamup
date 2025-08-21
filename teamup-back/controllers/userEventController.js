@@ -54,3 +54,37 @@ exports.unregisterFromEvent = async (req, res) => {
         res.status(500).json({ message: 'Erreur de serveur. Veuillez contacter l\'administrateur.', error: err.message });
     }
 }
+
+exports.getAllUsersRegisteredForEvent = async (req, res) => {
+    const { eventId, userId } = req.params;
+    if (!eventId) {
+        return res.status(400).json({ message: 'Champs manquants' });
+    }
+    const isUserTheOrganizer = await db.query('SELECT * FROM events WHERE id = ? AND organizer_user_id = ?', [eventId, userId]);
+    if (isUserTheOrganizer.length === 0) {
+        return res.status(403).json({ message: 'Accès refusé. Vous n\'êtes pas l\'organisateur de cet événement.' });
+    }
+    try {
+        const [registrations] = await db.query(`
+            SELECT
+                user_event.id AS registration_id,
+                user_event.user_id,
+                users.email,
+                profiles.first_name,
+                profiles.last_name,
+                profiles.birth_date
+            FROM user_event 
+            JOIN users ON user_event.user_id = users.id
+            JOIN profiles ON users.id = profiles.user_id
+            WHERE user_event.event_id = ?
+            ORDER BY
+                user_event.created_at ASC`, [eventId]);
+        registrations.forEach(element => {
+            element.birth_date = new Date(element.birth_date).toLocaleDateString();
+        });
+        console.log(`Fetched registrations for event ${eventId}:`, registrations);
+        res.json({ registrations });
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur de serveur. Veuillez contacter l\'administrateur.', error: err.message });
+    }
+};

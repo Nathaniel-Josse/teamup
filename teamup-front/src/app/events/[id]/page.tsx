@@ -72,8 +72,89 @@ export default function EventPage({ params }: { params: { id: string } }) {
     const [showForm, setShowForm] = useState<boolean>(false);
     const [sport, setSport] = useState<Sport | null>(null);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
+    const [currentAttendees, setCurrentAttendees] = useState<any[]>([]);
+    const [hasProfile, setHasProfile] = useState<boolean>(true); // default true for loading
+    const [showProfilePopup, setShowProfilePopup] = useState<boolean>(false);
+
+    useEffect(() => {
+        const checkUserProfile = async () => {
+            const userStr = localStorage.getItem("user");
+            if (!userStr) {
+                setHasProfile(false);
+                return;
+            }
+            const currentUser = JSON.parse(userStr);
+            setUserId(currentUser.id);
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${currentUser.id}`);
+                if (!res.ok) throw new Error("Erreur lors de la vérification du profil utilisateur.");
+                const data = await res.json();
+                setHasProfile(!!data.exists);
+            } catch {
+                setHasProfile(false);
+            }
+        };
+        checkUserProfile();
+    }, []);
+
+    useEffect(() => {
+        const fetchEvent = async () => {
+            console.log("Fetching event with ID:", id);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${id}`);
+            if (!res.ok) return;
+            const data = await res.json();
+            setEvent(data);
+
+            // Fetch organizer info
+            const orgExistsRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${data.organizer_user_id}`);
+            if (orgExistsRes.ok) {
+                const orgExistsData = await orgExistsRes.json();
+                if (orgExistsData) {
+                    const orgRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${orgExistsData.profile_id}`);
+                    if (orgRes.ok) {
+                        const orgData = await orgRes.json();
+                        setOrganizer(orgData);
+                    }
+                }
+            }
+
+            // Fetch sport info
+            const sportRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sports/${data.sport_id}`);
+            if (sportRes.ok) {
+                const sportData = await sportRes.json();
+                setSport(sportData);
+            }
+
+            // Check if the current user is the organizer
+            const currentUserId = JSON.parse(localStorage.getItem("user") || "{}").id;
+            setUserId(currentUserId);
+            const isUserOrganizer = data.organizer_user_id === currentUserId;
+            setIsOrganizer(isUserOrganizer);
+            if(!isUserOrganizer) {
+                // We check if the user is registered
+                const regRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${data.id}/users/${currentUserId}/registered`);
+                if (regRes.ok) {
+                    const regData = await regRes.json();
+                    setIsRegistered(regData.registered);
+                }
+            } else {
+                // Fetch all attendees if the user is the organizer
+                const attendeesRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${data.id}/users/${currentUserId}/all`);
+                if (attendeesRes.ok) {
+                    const attendeesData = await attendeesRes.json();
+                    setCurrentAttendees(attendeesData.registrations);
+                }
+            }
+            setIsLoading(false);
+        };
+        fetchEvent();
+    }, [id]);
 
     const handleRegister = async () => {
+        if (!hasProfile) {
+            setShowProfilePopup(true);
+            return;
+        }
         const csrfToken = await getCsrfToken();
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event.organizer_user_id}/register`,
@@ -178,52 +259,6 @@ export default function EventPage({ params }: { params: { id: string } }) {
         setShowDeletePopup(false);
     };
 
-    useEffect(() => {
-        const fetchEvent = async () => {
-            console.log("Fetching event with ID:", id);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${id}`);
-            if (!res.ok) return;
-            const data = await res.json();
-            setEvent(data);
-
-            // Fetch organizer info
-            const orgExistsRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${data.organizer_user_id}`);
-            if (orgExistsRes.ok) {
-                const orgExistsData = await orgExistsRes.json();
-                if (orgExistsData) {
-                    const orgRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${orgExistsData.profile_id}`);
-                    if (orgRes.ok) {
-                        const orgData = await orgRes.json();
-                        setOrganizer(orgData);
-                    }
-                }
-            }
-
-            // Fetch sport info
-            const sportRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sports/${data.sport_id}`);
-            if (sportRes.ok) {
-                const sportData = await sportRes.json();
-                setSport(sportData);
-            }
-
-            // Check if the current user is the organizer
-            const currentUserId = JSON.parse(localStorage.getItem("user") || "{}").id;
-            setUserId(currentUserId);
-            const isUserOrganizer = data.organizer_user_id === currentUserId;
-            setIsOrganizer(isUserOrganizer);
-            if(!isUserOrganizer) {
-                // We check if the user is registered
-                const regRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${data.id}/users/${currentUserId}/registered`);
-                if (regRes.ok) {
-                    const regData = await regRes.json();
-                    setIsRegistered(regData.registered);
-                }
-            }
-            setIsLoading(false);
-        };
-        fetchEvent();
-    }, [id]);
-
     if (!event) {
         return < Spinner />;
     }
@@ -284,6 +319,17 @@ export default function EventPage({ params }: { params: { id: string } }) {
                                 >
                                     Supprimer l&apos;événement
                                 </button>
+                                <div>
+                                    <h3 className="text-lg mt-4 font-bold">Participants actuels : {currentAttendees?.length}</h3>
+                                    <ol>
+                                        {currentAttendees?.length > 0 ?
+                                        currentAttendees.map((attendee) => (
+                                            <li key={attendee.registration_id}>- {attendee.first_name ?? 'Prénom inconnu'} {attendee.last_name ?? 'Nom inconnu'} [Né le {attendee.birth_date ?? '?'}] ({attendee.email ?? 'Email inconnu'})</li>
+                                        )) : (
+                                            <li>Aucun participant inscrit</li>
+                                        )}
+                                    </ol>
+                                </div>
                                 {showDeletePopup && (
                                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                                         <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
@@ -330,6 +376,28 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             )}
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+            {showProfilePopup && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+                        <h3 className="text-lg font-bold mb-4 text-black">Profil requis</h3>
+                        <p className="mb-6 text-black">Vous devez créer un profil avant de pouvoir vous inscrire à un événement.</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                onClick={() => setShowProfilePopup(false)}
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                onClick={() => window.location.href = "/my-account"}
+                            >
+                                Créer mon profil
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

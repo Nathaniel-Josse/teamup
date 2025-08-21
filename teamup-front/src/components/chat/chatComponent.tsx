@@ -5,7 +5,6 @@ import io, { Socket } from 'socket.io-client';
 import { getCsrfToken } from '@/helpers/getCsrfToken';
 import { getUserIdFromToken } from '@/helpers/getUserIdFromToken';
 
-const socketInstance = io;
 const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
 
 const ChatComponent: React.FC = () => {
@@ -19,7 +18,7 @@ const ChatComponent: React.FC = () => {
     const currentRoomRef = useRef<string | null>(null);
 
     const userToken = typeof window !== "undefined" ? localStorage.getItem('token') : null;
-    const [hasProfile, setHasProfile] = useState<boolean>(true); // default true for loading
+    const [hasProfile, setHasProfile] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // Check if user has a profile
