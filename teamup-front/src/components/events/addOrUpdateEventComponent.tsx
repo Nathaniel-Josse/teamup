@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AddressInputWithMapComponent from './addressInputMapComponent';
 import Spinner from '../spinner';
 
@@ -34,11 +34,20 @@ type EventComponentProps = {
 };
 
 const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpdate, userId }) => {
+
+    const datesForForm = useMemo(() => {
+        return {
+            // We want the following format: YYYY-MM-DDTHH:MM
+            starting_date: event?.starting_date ? new Date(event.starting_date).toISOString().slice(0, 16) : '',
+            ending_date: event?.ending_date ? new Date(event.ending_date).toISOString().slice(0, 16) : '',
+        };
+    }, [event]);
+
     const [form, setForm] = useState<Event>({
         sport_id: event?.sport_id || 0,
         title: event?.title || '',
-        starting_date: event?.starting_date || '',
-        ending_date: event?.ending_date || '',
+        starting_date: datesForForm.starting_date,
+        ending_date: datesForForm.ending_date,
         location: event?.location || '',
         lat: event?.lat || 0,
         lon: event?.lon || 0,

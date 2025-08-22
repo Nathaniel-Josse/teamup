@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Madimi_One } from "next/font/google";
 import "./globals.css";
@@ -28,6 +28,20 @@ const madimiOne = Madimi_One({
 export const metadata: Metadata = {
   title: "TeamUp!",
   description: "Un Outil pour les Équipes Sportives",
+  applicationName: "TeamUp!",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "TeamUp!",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff"
 };
 
 export default async function RootLayout({

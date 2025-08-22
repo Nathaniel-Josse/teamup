@@ -1,4 +1,5 @@
 import React from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 
 type Status = 'open' | 'closed' | 'done' | 'cancelled';
@@ -31,6 +32,29 @@ const statusColors: Record<Status, string> = {
 };
 
 const EventCardComponent: React.FC<EventCardProps> = ({ event }) => {
+
+    const { starting_date, ending_date } = event;
+
+    const formattedDates = useMemo(() => {
+        const start = new Date(starting_date).toLocaleString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const end = new Date(ending_date).toLocaleString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        return { start, end };
+    }, [starting_date, ending_date]);
+
     return (
         <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             <div className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
@@ -47,11 +71,11 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event }) => {
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">{event.title}</h3>
                 <div className="flex items-center text-gray-700 mb-1">
                     <span className="font-semibold mr-2">Début:</span>
-                    <span>{event.starting_date}</span>
+                    <span>{formattedDates.start}</span>
                 </div>
                 <div className="flex items-center text-gray-700 mb-1">
                     <span className="font-semibold mr-2">Fin:</span>
-                    <span>{event.ending_date}</span>
+                    <span>{formattedDates.end}</span>
                 </div>
                 <div className="flex items-center text-gray-700 mb-1">
                     <span className="font-semibold mr-2">Lieu:</span>

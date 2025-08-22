@@ -88,27 +88,7 @@ exports.createEvent = async (req, res) => {
 exports.getAllEvents = async (req, res) => {
     try {
         const [events] = await db.query('SELECT * FROM events ORDER BY status ASC, starting_date ASC');
-        // We convert the date fields to "dd/mm/yyyy hh:mm" format for better readability
-        events.forEach(event => {
-            if (event.starting_date) {
-                event.starting_date = new Date(event.starting_date).toLocaleString('fr-FR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-            if (event.ending_date) {
-                event.ending_date = new Date(event.ending_date).toLocaleString('fr-FR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-        });
+        
         // If the user provided lat and lon, we calculate the distance to each event
         const { lat: userLat, lon: userLon } = req?.query;
         if (userLat && userLon) {
@@ -136,25 +116,6 @@ exports.getEventById = async (req, res) => {
         const [events] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
         if (events.length === 0) {
             return res.status(404).json({ message: "Événement non trouvé." });
-        }
-        // Convert date fields to "dd/mm/yyyy hh:mm" format
-        if (events[0].starting_date) {
-            events[0].starting_date = new Date(events[0].starting_date).toLocaleString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        if (events[0].ending_date) {
-            events[0].ending_date = new Date(events[0].ending_date).toLocaleString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
         }
         res.json(events[0]);
     } catch (err) {

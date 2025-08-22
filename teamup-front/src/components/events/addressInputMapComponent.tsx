@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl"; // for types only
@@ -27,6 +27,14 @@ const LocationMarker = ({ setPosition }: { setPosition: Function }) => {
     return null;
 };
 
+const CenterMapOnPosition = ({ position }: { position: { lat: number; lng: number } }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.setView([position.lat, position.lng], map.getZoom(), { animate: true });
+    }, [position, map]);
+    return null;
+};
+
 export default function AddressInputWithMapComponent({
     onAddressChange,
     defaultPosition = [48.8566, 2.3522], // Default to Paris coordinates
@@ -38,7 +46,7 @@ export default function AddressInputWithMapComponent({
     }) => void;
     defaultPosition?: [number, number];
 }) {
-    const [address, setAddress] = useState("");
+    const [address, setAddress] = useState<string>("");
     const [position, setPosition] = useState<{ lat: number; lng: number }>({
         lat: defaultPosition[0],
         lng: defaultPosition[1],
@@ -150,6 +158,7 @@ export default function AddressInputWithMapComponent({
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <LocationMarker setPosition={setPosition} />
+                <CenterMapOnPosition position={position} />
                 <Marker position={[position.lat, position.lng]} icon={locationIcon} />
             </MapContainer>
         </div>

@@ -36,7 +36,7 @@ export default function Home() {
     }, []);
 
     return (
-        <main className="min-h-screen bg-page-background">
+        <main className="min-h-screen bg-button-primary">
             {/* Navbar */}
             <nav className="w-full flex items-center justify-between px-8 py-4 bg-white shadow">
                 <div>
