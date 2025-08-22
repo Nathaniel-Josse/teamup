@@ -115,9 +115,10 @@ exports.getRoomMemberIdByUserId = async (req, res) => {
 
 exports.removeRoomMember = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM room_members WHERE id = ?', [req.params.id]);
+        const { roomId, userId } = req.params;
+        const [rows] = await db.query('SELECT * FROM room_members WHERE room_id = ? AND user_id = ?', [roomId, userId]);
         if (rows.length === 0) return res.status(404).json({ error: 'Not found' });
-        await db.query('DELETE FROM room_members WHERE id = ?', [req.params.id]);
+        await db.query('DELETE FROM room_members WHERE room_id = ? AND user_id = ?', [roomId, userId]);
         res.json({ message: 'Deleted', member: rows[0] });
     } catch (err) {
         res.status(500).json({ error: err.message });

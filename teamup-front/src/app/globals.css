@@ -3,7 +3,6 @@
 :root {
   --background: #4c7187;
   --foreground: #f0f4f8;
-  --h2-color: #090909;
   --button-primary: #f97858;
   --page-background: #f0f4f8;
 }
@@ -44,7 +43,6 @@ h2 {
   font-weight: 400;
   font-size: 2rem;
   margin-block: 1rem;
-  color: var(--h2-color);
 }
 
 a {

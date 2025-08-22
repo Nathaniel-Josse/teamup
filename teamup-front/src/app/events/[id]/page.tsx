@@ -295,7 +295,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                         description: event.description
                     }} />
                     <div className="bg-white text-black rounded-lg shadow p-6 mt-6">
-                        <h2 className="text-xl font-bold mb-2">Détails de l&apos;événement</h2>
+                        <h2 className="text-xl font-bold mb-2 text-black">Détails de l&apos;événement</h2>
                         <p><span className="font-semibold">Organisateur :</span> {organizer ? organizer.first_name + " " + organizer.last_name : "Inconnu"}</p>
                         <p><span className="font-semibold">Sport :</span> {sport ? sport.label : event.sport_id}</p>
                         <div className="my-4">

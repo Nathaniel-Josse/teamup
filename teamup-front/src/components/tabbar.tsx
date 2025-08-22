@@ -17,7 +17,7 @@ const tabs = [
 export default function TabBar() {
     const pathname = usePathname();
 
-    if (pathname === "/auth/login" || pathname === "/auth/signup") {
+    if (pathname === "/auth/login" || pathname === "/auth/signup" || pathname === "/home") {
         return null;
     }
 

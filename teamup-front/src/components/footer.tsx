@@ -15,7 +15,7 @@ const Footer: React.FC = () => (
                 </a>
             </div>
             <div className="text-sm text-gray-500">
-                &copy; {new Date().getFullYear()} TeamUp. Tous droits réservés.
+                &copy; {new Date().getFullYear()} TeamUp!. Tous droits réservés.
             </div>
         </div>
     </footer>

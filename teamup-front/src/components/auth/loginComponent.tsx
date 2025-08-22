@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import LogoComponent from "../logoComponent";
+import Link from "next/link";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
@@ -47,7 +48,9 @@ export default function LoginComponent() {
     return (
         <div className="flex items-center justify-center bg-page-background">
             <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 space-y-6 border border-gray-800 w-full">
-                <LogoComponent />
+                <Link href="/home">
+                    <LogoComponent />
+                </Link>
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {error && (
                         <div className="bg-red-900/70 text-red-300 px-6 py-3 rounded mb-6 text-center font-medium">

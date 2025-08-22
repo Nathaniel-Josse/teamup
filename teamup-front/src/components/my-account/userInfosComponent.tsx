@@ -47,7 +47,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
     return (
         <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 space-y-6">
             <LogoComponent />
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informations principales</h2>
+            <h2 className="text-2xl font-semibold text-black mb-4">Informations principales</h2>
             
             {/* Profile Picture */}
             <ProfilePictureComponent />
@@ -83,7 +83,7 @@ const UserInfosComponent: React.FC<Props> = ({ user, onUpdate }) => {
             <hr className="text-gray-300"></hr>
             {/* Editable fields */}
             {/* Email */}
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Modifier vos informations</h2>
+            <h2 className="text-xl font-semibold text-black mb-4">Modifier vos informations</h2>
             <div className="flex flex-col items-center">
                 <label className="font-semibold text-gray-700">Email:</label>
                 <input

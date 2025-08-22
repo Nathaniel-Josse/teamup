@@ -28,8 +28,8 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
         last_name: profile?.last_name || '',
         birth_date: profile?.birth_date || '',
         fav_sport_id: profile?.fav_sport_id || 0,
-        level: profile?.level || 'beginner',
-        availability: profile?.availability || 'weekday',
+        level: { id: profile?.level.id || 'beginner', label: profile?.level.label || 'Débutant' },
+        availability: { id: profile?.availability.id || 'weekday', label: profile?.availability.label || 'Les jours de semaine' },
     });
 
     const [sports, setSports] = useState<Sport[]>([]);
@@ -79,7 +79,7 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
         <div className="max-w-lg mx-auto shadow-md main-page-background rounded-lg p-6 space-y-6">
             {profile && (
                 <div className="mb-8">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">Votre Profil</h2>
+                    <h2 className="text-2xl font-semibold text-black mb-4">Votre Profil</h2>
                     <div className="flex items-center space-x-4 mb-2">
                         <label className="w-40 font-semibold text-gray-700">Prénom:</label>
                         <span className="flex-1 text-gray-900">{profile.first_name}</span>
@@ -100,16 +100,16 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
                     </div>
                     <div className="flex items-center space-x-4 mb-2">
                         <label className="w-40 font-semibold text-gray-700">Niveau:</label>
-                        <span className="flex-1 text-gray-900">{profile.level}</span>
+                        <span className="flex-1 text-gray-900">{profile.level.label}</span>
                     </div>
                     <div className="flex items-center space-x-4 mb-2">
                         <label className="w-40 font-semibold text-gray-700">Disponibilités:</label>
-                        <span className="flex-1 text-gray-900">{profile.availability}</span>
+                        <span className="flex-1 text-gray-900">{profile.availability.label}</span>
                     </div>
                 </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">{profile ? 'Mettre à jour votre profil' : 'Créer votre profil'}</h2>
+                <h2 className="text-xl font-semibold text-black mb-4">{profile ? 'Mettre à jour votre profil' : 'Créer votre profil'}</h2>
                 <div className="flex flex-col items-center">
                     <label className="font-semibold text-gray-700 w-full text-center mb-1">
                         Prénom:
@@ -176,7 +176,7 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
                     </label>
                     <select
                         name="level"
-                        value={form.level}
+                        value={form.level.id}
                         onChange={handleChange}
                         required
                         className="w-4/5 border rounded px-2 py-1 flex-1 text-black"
@@ -192,7 +192,7 @@ const ProfileComponent: React.FC<ProfileComponentProps> = ({ profile, onUpdate }
                     </label>
                     <select
                         name="availability"
-                        value={form.availability}
+                        value={form.availability.id}
                         onChange={handleChange}
                         required
                         className="w-4/5 border rounded px-2 py-1 flex-1 text-black"

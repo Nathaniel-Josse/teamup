@@ -76,8 +76,8 @@ exports.getProfileById = async (req, res) => {
 
         // Convert level and availability to their labels
         const profile = rows[0];
-        profile.level = LEVELS.find(l => l.id === profile.level)?.label || profile.level;
-        profile.availability = AVAILABILITIES.find(a => a.id === profile.availability)?.label || profile.availability;
+        profile.level = { id: profile.level, label: LEVELS.find(l => l.id === profile.level)?.label || profile.level };
+        profile.availability = { id: profile.availability, label: AVAILABILITIES.find(a => a.id === profile.availability)?.label || profile.availability };
 
         // Format birth_date if it exists
         if (profile.birth_date) {
@@ -104,12 +104,12 @@ exports.updateProfile = async (req, res) => {
             availability
         } = req.body;
 
-        if (level && !LEVELS.includes(level)) {
-            return res.status(400).json({ error: 'Invalid level value' });
+        if(!LEVELS.map(l => l.id).includes(level.id) || !AVAILABILITIES.map(a => a.id).includes(availability.id)) {
+            return res.status(400).json({ error: 'Invalid level or availability value' });
         }
-        if (availability && !AVAILABILITIES.includes(availability)) {
-            return res.status(400).json({ error: 'Invalid availability value' });
-        }
+
+        const levelId = level.id;
+        const availabilityId = availability.id;
 
         const [result] = await db.query(
             `UPDATE profiles SET 
@@ -121,7 +121,7 @@ exports.updateProfile = async (req, res) => {
                 availability = COALESCE(?, availability),
                 updated_at = NOW()
             WHERE id = ?`,
-            [fav_sport_id, first_name, last_name, birth_date, level, availability, id]
+            [fav_sport_id, first_name, last_name, birth_date, levelId, availabilityId, id]
         );
 
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Profile not found' });

@@ -156,7 +156,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                     {hasProfile ? (
                         <div>
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                <h2 className="text-xl font-semibold text-black mb-4">
                                     {event ? 'Mettre à jour votre événement' : 'Créer un événement'}
                                 </h2>
                                 <div className="flex flex-col items-center">

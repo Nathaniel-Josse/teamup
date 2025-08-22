@@ -141,6 +141,7 @@ export default function MyAccountMainPage() {
                             "X-CSRF-Token": csrfToken,
                         },
                         body: JSON.stringify(updated),
+                        credentials: "include"
                     }
                 ) :
                 await fetch(

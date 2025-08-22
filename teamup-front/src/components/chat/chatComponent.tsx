@@ -254,12 +254,49 @@ const ChatComponent: React.FC = () => {
             }
 
             const newRoom = await response.json();
-            setRooms(prevRooms => [...prevRooms, newRoom]);
+            window.location.reload();
+            //setRooms(prevRooms => [...prevRooms, newRoom]);
             setSelectedRoomId(newRoom.room_id);
 
         } catch (error) {
             console.error("Error creating room:", error);
             alert("Erreur lors de la création du salon.");
+        }
+    };
+
+    const handleLeaveRoom = async (roomId: string) => {
+        if (!userToken) return;
+
+        const userId = getUserIdFromToken(userToken);
+
+        const csrfToken = await getCsrfToken();
+        if (!csrfToken) {
+            alert("Erreur: Impossible d'obtenir le token de sécurité.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${roomId}/members/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                    'x-csrf-token': csrfToken
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Échec de la sortie du salon.');
+            }
+
+            // On success, refresh the room list
+            window.location.reload();
+
+        } catch (error) {
+            console.error("Erreur lors de la sortie du salon:", error);
+            alert(`Erreur: ${error.message}`);
         }
     };
 
@@ -369,17 +406,44 @@ const ChatComponent: React.FC = () => {
             <div className="flex-1 flex flex-col">
                 <div className="border-b border-gray-300 px-4 py-3 bg-gray-50 font-semibold text-lg text-black max-md:ml-15 flex justify-between items-center">
                     {rooms.find(r => r.room_id === selectedRoomId)?.name || 'Salon de discussion'}
-                    {selectedRoomId && (
-                        <button
-                            onClick={fetchRoomMembers}
-                            className="ml-2 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
-                            aria-label="Afficher les membres"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.93 0 3.5 1.57 3.5 3.5S13.93 12 12 12 8.5 10.43 8.5 8.5 10.07 5 12 5zm0 14.9c-2.97 0-6.15-1.78-8.24-5.32C4.16 13.56 7.02 11.5 12 11.5s7.84 2.06 8.24 4.08c-2.09 3.54-5.27 5.32-8.24 5.32z" fill="currentColor"/>
-                            </svg>
-                        </button>
-                    )}
+                    <div className="flex items-center">
+                        {selectedRoomId && (
+                            <>
+                                <button
+                                    onClick={fetchRoomMembers}
+                                    className="ml-2 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition flex items-center justify-center"
+                                    aria-label="Afficher les membres"
+                                >
+                                    <span className="inline-flex items-center justify-center w-10 h-10 bg-[#f97858] rounded-full">
+                                        <img
+                                            src="/assets/images/person.svg"
+                                            alt="Membres"
+                                            className="w-8 h-8"
+                                            style={{ display: "block" }}
+                                        />
+                                    </span>
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm("Voulez-vous vraiment quitter ce salon ?")) {
+                                            handleLeaveRoom(selectedRoomId);
+                                        }
+                                    }}
+                                    className="ml-2 p-2 rounded-full bg-gray-200 hover:bg-red-200 transition flex items-center justify-center"
+                                    aria-label="Quitter le salon"
+                                >
+                                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full">
+                                        <img
+                                            src="/assets/images/leave-chat.svg"
+                                            alt="Quitter le salon"
+                                            className="w-8 h-8"
+                                            style={{ display: "block" }}
+                                        />
+                                    </span>
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                     {messages.length === 0 ? (
