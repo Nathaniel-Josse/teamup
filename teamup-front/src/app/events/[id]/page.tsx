@@ -38,12 +38,16 @@ async function getSport(sportId: number) {
     return res.json();
 }
 
-export default async function EventPage({ params }: { params: { id: string } }) {
-    const { id } = await params;
+export default async function EventPage({ params }: any) {
+    const { id } = params;
 
     const currentEvent = await getEvent(id);
-    const currentOrganizer = await getOrganizer(currentEvent.organizer_user_id);
-    const currentSport = await getSport(currentEvent.sport_id);
+
+    // Now you have the event, you can fetch the related data
+    const [currentOrganizer, currentSport] = await Promise.all([
+        getOrganizer(currentEvent.organizer_user_id),
+        getSport(currentEvent.sport_id),
+    ]);
 
     return <EventDetailsClientComponent currentEvent={currentEvent} currentOrganizer={currentOrganizer} currentSport={currentSport} />;
 }

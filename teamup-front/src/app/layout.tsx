@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Madimi_One } from "next/font/google";
 import "./globals.css";
 import TabBar from "@/components/tabbar";
@@ -7,17 +6,6 @@ import Footer from "@/components/footer";
 import 'leaflet/dist/leaflet.css';
 import { headers } from 'next/headers';
 import Script from 'next/script';
-import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const madimiOne = Madimi_One({
   weight: "400",

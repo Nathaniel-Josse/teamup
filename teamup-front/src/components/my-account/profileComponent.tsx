@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-type Level = 'beginner' | 'intermediate' | 'expert';
-type Availability = 'weekday' | 'weekend' | 'both';
-
 type Sport = {
     id: number;
     label: string;
@@ -13,8 +10,8 @@ type UserProfile = {
     last_name: string;
     birth_date?: string | null;
     fav_sport_id: number;
-    level: Level;
-    availability: Availability;
+    level: { id: string; label: string };
+    availability: { id: string; label: string };
 };
 
 type ProfileComponentProps = {

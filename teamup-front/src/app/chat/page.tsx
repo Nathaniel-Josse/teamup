@@ -1,18 +1,9 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ChatComponent from "@/components/chat/chatComponent";
 
 export default function Chat() {
-
-    type UserInfo = {
-        id: string;
-        email: string;
-        password: string;
-        subrole: string;
-    };
-
-    const [user, setUser] = useState<UserInfo | null>(null);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -21,7 +12,6 @@ export default function Chat() {
                 window.location.href = "/auth/login";
                 return;
             }
-            setUser(JSON.parse(userStr));
         }
     }, []);
 

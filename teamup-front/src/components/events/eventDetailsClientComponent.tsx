@@ -62,14 +62,14 @@ async function getCsrfToken() {
 }
 
 export default function EventDetailsClientComponent({ currentEvent, currentOrganizer, currentSport }: any) {
-    const [event, setEvent] = useState<Event>(currentEvent);
+    const [event] = useState<Event>(currentEvent);
     const [userId, setUserId] = useState<string | null>(null);
-    const [organizer, setOrganizer] = useState<Organizer>(currentOrganizer);
+    const [organizer] = useState<Organizer>(currentOrganizer);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isOrganizer, setIsOrganizer] = useState<boolean>(false);
     const [isRegistered, setIsRegistered] = useState<boolean>(false);
     const [showForm, setShowForm] = useState<boolean>(false);
-    const [sport, setSport] = useState<Sport>(currentSport);
+    const [sport] = useState<Sport>(currentSport);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [currentAttendees, setCurrentAttendees] = useState<any[]>([]);
     const [hasProfile, setHasProfile] = useState<boolean>(true); // default true for loading

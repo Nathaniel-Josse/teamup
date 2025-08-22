@@ -21,8 +21,8 @@ type UserProfile = {
     last_name: string;
     birth_date?: string | null;
     fav_sport_id: number;
-    level: 'beginner' | 'intermediate' | 'expert';
-    availability: 'weekday' | 'weekend' | 'both';
+    level: { id: string; label: string };
+    availability: { id: string; label: string };
 };
 
 // Helper to fetch CSRF token

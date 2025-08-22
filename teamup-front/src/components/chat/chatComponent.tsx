@@ -7,10 +7,24 @@ import { getUserIdFromToken } from '@/helpers/getUserIdFromToken';
 
 const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
 
+type Message = {
+    id: number;
+    room_id: number;
+    created_at: string;
+    first_name: string;
+    last_name: string;
+    content: string;
+};
+
+type Room = {
+    room_id: string;
+    name: string;
+};
+
 const ChatComponent: React.FC = () => {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
-    const [rooms, setRooms] = useState([]);
+    const [rooms, setRooms] = useState<Room[]>([]);
     const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
     const [showSidebar, setShowSidebar] = useState(false);
     const [showMembersPopup, setShowMembersPopup] = useState(false);
@@ -220,7 +234,7 @@ const ChatComponent: React.FC = () => {
 
         } catch (error) {
             console.error("Erreur lors de l'ajout du membre:", error);
-            alert(`Erreur: ${error.message}`);
+            alert(`Erreur: ${error}`);
         }
     };
 
@@ -296,7 +310,7 @@ const ChatComponent: React.FC = () => {
 
         } catch (error) {
             console.error("Erreur lors de la sortie du salon:", error);
-            alert(`Erreur: ${error.message}`);
+            alert(`Erreur: ${error}`);
         }
     };
 

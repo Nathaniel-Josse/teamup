@@ -3,7 +3,6 @@
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl"; // for types only
 import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding";
 import L from "leaflet";
 
@@ -18,7 +17,7 @@ const locationIcon = L.icon({
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
-const LocationMarker = ({ setPosition }: { setPosition: Function }) => {
+const LocationMarker = ({ setPosition }: { setPosition: (latlng: L.LatLng) => void }) => {
     useMapEvents({
         click(e) {
             setPosition(e.latlng);

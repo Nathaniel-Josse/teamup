@@ -65,6 +65,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
     });
     const [pictureFile, setPictureFile] = useState<File | null>(null);
     const [hasProfile, setHasProfile] = useState<boolean>(false);
+    const [isAnUpdate, setIsAnUpdate] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -94,6 +95,8 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
             setIsLoading(false);
             fetchSports();
         });
+
+        setIsAnUpdate(!!event);
     }, []);
 
     // Update form when addressData changes
@@ -148,9 +151,13 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
         onUpdate({ ...mergedForm }, pictureFile);
     };
 
-    const getPictureUrl = () => {
+    const getPictureUrl = (): string => {
         try {
-            return form.picture ? process.env.NEXT_PUBLIC_UPLOAD_PROTOCOL + "://" + process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + form.picture : form.picture;
+            const picture = isAnUpdate ? process.env.NEXT_PUBLIC_UPLOAD_PROTOCOL + "://" + process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + form.picture : form.picture;
+            if (picture) {
+                return picture;
+            }
+            return "";
         } catch {
             return "";
         }

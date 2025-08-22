@@ -21,11 +21,16 @@ export default function Events() {
     type Event = {
         id: number;
         sport_id: number;
+        organizer_user_id: string;
         picture: string;
         title: string;
+        description: string;
         starting_date: string;
         ending_date: string;
         location: string;
+        lat: number;
+        lon: number;
+        max_attendees: number;
         status: Status;
     };
 
