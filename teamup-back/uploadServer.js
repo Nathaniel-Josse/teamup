@@ -1,9 +1,9 @@
 const express = require('express');
 const next = require('next');
 const path = require('path');
-const dotenv = require('dotenv');
+//const dotenv = require('dotenv');
 
-dotenv.config();
+//dotenv.config();
 
 const app = next({ dev: true });
 const handle = app.getRequestHandler();

@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const dotenv = require('dotenv');
+//const dotenv = require('dotenv');
 const { getRoomsForUser, createMessage, getRoomMemberIdByUserId } = require('./controllers/chatController');
 const { getProfileByUserId } = require('./controllers/profileController');
 const jwt = require('jsonwebtoken');
@@ -9,7 +9,7 @@ const { verifyUserToken } = require('./helpers/verifyUserToken');
 const { formatDateFromDB } = require('./helpers/formatDateFromDB');
 const cors = require('cors');
 
-dotenv.config();
+//dotenv.config();
 
 const app = express();
 const server = http.createServer(app);

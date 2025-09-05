@@ -2,9 +2,9 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-const dotenv = require('dotenv');
+//const dotenv = require('dotenv');
 const axios = require('axios');
-dotenv.config();
+//dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default';
 

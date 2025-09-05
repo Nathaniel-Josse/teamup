@@ -1,11 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
+//const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const csrf = require('csurf');
 
-dotenv.config();
+//dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
