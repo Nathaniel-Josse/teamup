@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
     const backendChatUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
     let cspHeader = '';
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') {
         // For development, allow unsafe-eval and unsafe-inline for easier debugging.
         cspHeader = `
         default-src 'self';
