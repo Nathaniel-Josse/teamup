@@ -44,5 +44,6 @@ testem.log
 Thumbs.db
 
 .env
-.env
+.env.development
+.env.production
 *.local
