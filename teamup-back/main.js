@@ -16,7 +16,8 @@ app.use(cookieParser());
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
 }));
 
 // CSRF protection middleware (use after bodyParser and cors)
