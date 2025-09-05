@@ -257,7 +257,7 @@ const ChatComponent: React.FC = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${userToken}`,
                     // 2. Add the CSRF token to the headers
-                    'x-csrf-token': csrfToken // Or whatever header name you configured
+                    'x-csrf-token': csrfToken
                 },
                 body: JSON.stringify({ name: newRoomName, user: userId }),
                 credentials: 'include'

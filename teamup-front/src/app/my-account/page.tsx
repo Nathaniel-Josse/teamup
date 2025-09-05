@@ -106,6 +106,7 @@ export default function MyAccountMainPage() {
                         "Content-Type": "application/json",
                         "X-CSRF-Token": csrfToken,
                     },
+                    credentials: "include",
                     body: JSON.stringify(updated),
                 }
             );
@@ -152,6 +153,7 @@ export default function MyAccountMainPage() {
                             "Content-Type": "application/json",
                             "X-CSRF-Token": csrfToken,
                         },
+                        credentials: "include",
                         body: JSON.stringify({ user_id: user.id, ...updated }),
                     }
                 );
