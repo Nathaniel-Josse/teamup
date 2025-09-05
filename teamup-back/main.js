@@ -4,6 +4,9 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const csrf = require('csurf');
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const Redis = require('ioredis');
 
 //dotenv.config();
 
@@ -19,6 +22,31 @@ app.use(cors({
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
 }));
+
+if (process.env.NODE_ENV === 'production') {
+    const redisClient = new Redis(process.env.REDIS_URL);
+    const redisStore = new RedisStore({ client: redisClient });
+
+    app.use(
+        session({
+            store: redisStore,
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                secure: true,
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 24, // 1 day
+            },
+        })
+    );
+} else {
+    app.use(session({
+        secret: 'a-super-secret-key-for-dev-omg-who-cares',
+        resave: false,
+        saveUninitialized: false,
+    }));
+}
 
 // CSRF protection middleware (use after bodyParser and cors)
 const csrfProtection = csrf({
