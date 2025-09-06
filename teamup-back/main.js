@@ -71,6 +71,12 @@ const csrfProtection = csrf({
         httpOnly: true, // ✅ More secure - token stored in httpOnly cookie
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    },
+    value: (req) => {
+        return req.body?._csrf || 
+               req.query?._csrf || 
+               req.headers['x-csrf-token'] || 
+               req.headers['csrf-token'];
     }
 });
 
@@ -93,7 +99,7 @@ app.use((req, res, next) => {
         console.log('- Method:', req.method);
         console.log('- Path:', req.path);
         console.log('- CSRF Token from header:', req.get('X-CSRF-Token') || req.get('x-csrf-token'));
-        console.log('- CSRF Token from body:', req.body._csrf);
+        console.log('- CSRF Token from body:', req.body?._csrf);
         console.log('- Session ID:', req.sessionID);
         console.log('- Cookies:', Object.keys(req.cookies));
     }

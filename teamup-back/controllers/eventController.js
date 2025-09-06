@@ -21,6 +21,8 @@ exports.uploadEventPicture = upload.single('picture');
 // Create a new event
 exports.createEvent = async (req, res) => {
     console.log("Creating event with body:", req.body);
+    console.log("Uploaded file:", req.file); // Add this for debugging
+    
     const {
         organizer_user_id,
         sport_id,
@@ -35,14 +37,15 @@ exports.createEvent = async (req, res) => {
         description
     } = req.body;
 
-    // If a file was uploaded, get its path
+    // Handle picture upload - only use uploaded file, ignore blob URLs
     let picture = null;
     if (req.file) {
         picture = `/uploads/${req.file.filename}`;
-    } else if (req.body.picture) {
-        picture = req.body.picture;
+        console.log("Picture set to:", picture); // Debug log
     }
+    // Remove the fallback to req.body.picture as it contains invalid blob URL
 
+    // Validate required fields
     if (
         !organizer_user_id ||
         !sport_id ||
@@ -59,7 +62,7 @@ exports.createEvent = async (req, res) => {
     }
 
     try {
-        await db.query(
+        const [result] = await db.query(
             `INSERT INTO events (
                 organizer_user_id, sport_id, title, starting_date, ending_date, location, lat, lon, max_attendees, status, description, picture
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -78,8 +81,15 @@ exports.createEvent = async (req, res) => {
                 picture
             ]
         );
-        res.status(201).json({ message: 'Événement créé', picture });
+        
+        console.log("Event created successfully with ID:", result.insertId); // Debug log
+        res.status(201).json({ 
+            message: 'Événement créé', 
+            picture,
+            eventId: result.insertId 
+        });
     } catch (err) {
+        console.error("Database error:", err); // Add detailed error logging
         res.status(500).json({ message: 'Erreur de serveur.', error: err.message });
     }
 };
@@ -140,30 +150,31 @@ exports.updateEvent = async (req, res) => {
         userId
     } = req.body;
 
-    // We check if the user is the organizer of the event
-    if (!userId) {
-        return res.status(403).json({ message: "Utilisateur non autorisé." });
-    }
-    const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
-    if (event.length === 0) {
-        return res.status(404).json({ message: "Événement non trouvé." });
-    }
-    if (event[0].organizer_user_id !== userId) {
-        return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cet événement." });
-    }
-
-    let picture = null;
-    if (req.file) {
-        picture = `/uploads/${req.file.filename}`;
-    } else if (req.body.picture) {
-        picture = req.body.picture;
-    }
-
     if (!id) {
         return res.status(400).json({ message: "ID événement manquant." });
     }
 
+    // Check if user is authorized
+    if (!userId) {
+        return res.status(403).json({ message: "Utilisateur non autorisé." });
+    }
+
     try {
+        const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
+        if (event.length === 0) {
+            return res.status(404).json({ message: "Événement non trouvé." });
+        }
+        if (event[0].organizer_user_id !== userId) {
+            return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cet événement." });
+        }
+
+        // Handle picture upload - only use uploaded file, ignore blob URLs
+        let picture = null;
+        if (req.file) {
+            picture = `/uploads/${req.file.filename}`;
+        }
+        // Don't use req.body.picture as fallback for blob URLs
+
         const fields = [];
         const values = [];
         if (sport_id) { fields.push("sport_id = ?"); values.push(sport_id); }
@@ -181,10 +192,13 @@ exports.updateEvent = async (req, res) => {
         if (fields.length === 0) {
             return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
         }
+
         values.push(id);
         await db.query(`UPDATE events SET ${fields.join(", ")} WHERE id = ?`, values);
+        
         res.json({ message: "Événement mis à jour.", picture });
     } catch (err) {
+        console.error("Update event error:", err); // Add error logging
         res.status(500).json({ message: "Erreur de serveur.", error: err.message });
     }
 };

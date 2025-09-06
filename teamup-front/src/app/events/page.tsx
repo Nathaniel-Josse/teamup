@@ -76,9 +76,15 @@ export default function Events() {
                 });
                 formData.append("picture", pictureFile);
                 formData.append("organizer_user_id", user?.id || "");
+                formData.append("_csrf", csrfToken);
                 requestBody = formData;
             } else {
-                requestBody = JSON.stringify(form);
+                const bodyData = {
+                    ...form,
+                    organizer_user_id: user?.id || "",
+                    _csrf: csrfToken
+                };
+                requestBody = JSON.stringify(bodyData);
                 headers["Content-Type"] = "application/json";
             }
 
