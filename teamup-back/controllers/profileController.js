@@ -38,8 +38,20 @@ exports.createProfile = async (req, res) => {
             availability
         } = req.body;
 
-        if (!LEVELS.map(l => l.id).includes(level) || !AVAILABILITIES.map(a => a.id).includes(availability)) {
-            return res.status(400).json({ error: 'Données incorrectes' });
+        const levelId = typeof level === 'object' && level.id ? level.id : level;
+        const availabilityId = typeof availability === 'object' && availability.id ? availability.id : availability;
+
+        // Validate using the extracted IDs
+        if (!LEVELS.map(l => l.id).includes(levelId) || !AVAILABILITIES.map(a => a.id).includes(availabilityId)) {
+            return res.status(400).json({ 
+                error: 'Données incorrectes',
+                details: {
+                    validLevels: LEVELS.map(l => l.id),
+                    validAvailabilities: AVAILABILITIES.map(a => a.id),
+                    receivedLevel: levelId,
+                    receivedAvailability: availabilityId
+                }
+            });
         }
 
         console.log('Creating profile with data:', {
@@ -54,9 +66,8 @@ exports.createProfile = async (req, res) => {
 
         const [result] = await db.query(
             `INSERT INTO profiles 
-                (user_id, fav_sport_id, first_name, last_name, birth_date, level, availability, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-            [user_id, fav_sport_id, first_name, last_name, birth_date, level, availability]
+            SET user_id = ?, fav_sport_id = ?, first_name = ?, last_name = ?, birth_date = ?, level = ?, availability = ?`,
+            [user_id, fav_sport_id, first_name, last_name, birth_date, levelId, availabilityId]
         );
 
         // Add the profile ID to the user
