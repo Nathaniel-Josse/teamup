@@ -27,7 +27,7 @@ type UserProfile = {
 
 // Helper to fetch CSRF token
 async function getCsrfToken() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+    const res = await fetch(`/api/csrf-token`, {
         credentials: "include",
     });
     const data = await res.json();
@@ -47,7 +47,7 @@ export default function MyAccountMainPage() {
             if (!user) return;
             try {
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${user.id}`
+                    `/api/profiles/user/${user.id}`
                 )
                 if (!res.ok) {
                     throw new Error("Erreur lors de la récupération du profil.");
@@ -62,7 +62,7 @@ export default function MyAccountMainPage() {
 
                 // CHECK 2 : Fetch complete profile
                 await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${data.profile_id}`
+                    `/api/profiles/${data.profile_id}`
                 ).then(async res => {
                     if (!res.ok) {
                         throw new Error("Erreur lors de la récupération du profil.");
@@ -99,7 +99,7 @@ export default function MyAccountMainPage() {
         try {
             const csrfToken = await getCsrfToken();
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${user.id}`,
+                `/api/users/${user.id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -134,7 +134,7 @@ export default function MyAccountMainPage() {
             const csrfToken = await getCsrfToken();
             const res = profile?.id ?
                 await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${profile.id}`,
+                    `/api/profiles/${profile.id}`,
                     {
                         method: "PUT",
                         headers: {
@@ -146,7 +146,7 @@ export default function MyAccountMainPage() {
                     }
                 ) :
                 await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles`,
+                    `/api/profiles`,
                     {
                         method: "POST",
                         headers: {

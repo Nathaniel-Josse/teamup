@@ -2,7 +2,7 @@ import EventDetailsClientComponent from "@/components/events/eventDetailsClientC
 
 // Helper to fetch the event data
 async function getEvent(id: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${id}`);
+    const res = await fetch(`/api/events/${id}`);
     if (!res.ok) {
         throw new Error("Erreur lors de la récupération de l'événement.");
     }
@@ -13,7 +13,7 @@ async function getEvent(id: string) {
 // Helper to fetch organizer data
 async function getOrganizer(organizerUserId: string) {
     // ... your logic to fetch the organizer ...
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${organizerUserId}`);
+    const res = await fetch(`/api/profiles/user/${organizerUserId}`);
     if (!res.ok) {
         return null;
     }
@@ -21,7 +21,7 @@ async function getOrganizer(organizerUserId: string) {
     if (!orgExistsData) {
         return null;
     }
-    const orgRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/${orgExistsData.profile_id}`);
+    const orgRes = await fetch(`/api/profiles/${orgExistsData.profile_id}`);
     if (!orgRes.ok) {
         return null;
     }
@@ -31,7 +31,7 @@ async function getOrganizer(organizerUserId: string) {
 // Helper to fetch sport data
 async function getSport(sportId: number) {
     // ... your logic to fetch the sport ...
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sports/${sportId}`);
+    const res = await fetch(`/api/sports/${sportId}`);
     if (!res.ok) {
         return null;
     }

@@ -31,7 +31,7 @@ export default function NearestEventsPage() {
         const fetchNearestEvents = async () => {
             try {
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events?lat=${userLocation.lat}&lon=${userLocation.lon}`
+                    `/api/events?lat=${userLocation.lat}&lon=${userLocation.lon}`
                 );
                 if (!res.ok) throw new Error("Erreur lors de la récupération des événements proches.");
                 const data = await res.json();

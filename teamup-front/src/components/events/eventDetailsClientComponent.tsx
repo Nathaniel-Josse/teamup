@@ -54,7 +54,7 @@ type Sport = {
 
 // Helper to fetch the CSRF token
 async function getCsrfToken() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+    const res = await fetch(`/api/csrf-token`, {
         credentials: "include",
     });
     const data = await res.json();
@@ -86,7 +86,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
             const currentUser = JSON.parse(userStr);
             setUserId(currentUser.id);
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${currentUser.id}`);
+                const res = await fetch(`/api/profiles/user/${currentUser.id}`);
                 if (!res.ok) throw new Error("Erreur lors de la vérification du profil utilisateur.");
                 const data = await res.json();
                 setHasProfile(!!data.exists);
@@ -104,14 +104,14 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
             setIsOrganizer(isUserOrganizer);
             if(!isUserOrganizer) {
                 // If the user is not the organizer, we check if the user is registered to the event
-                const regRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event?.id}/users/${currentUserId}/registered`);
+                const regRes = await fetch(`/api/events/${event?.id}/users/${currentUserId}/registered`);
                 if (regRes.ok) {
                     const regData = await regRes.json();
                     setIsRegistered(regData.registered);
                 }
             } else {
                 // Fetch all attendees if the user is the organizer
-                const attendeesRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event?.id}/users/${currentUserId}/all`);
+                const attendeesRes = await fetch(`/api/events/${event?.id}/users/${currentUserId}/all`);
                 if (attendeesRes.ok) {
                     const attendeesData = await attendeesRes.json();
                     setCurrentAttendees(attendeesData.registrations);
@@ -130,7 +130,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
         }
         const csrfToken = await getCsrfToken();
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event?.organizer_user_id}/register`,
+            `/api/events/${event?.organizer_user_id}/register`,
             {
                 method: "POST",
                 body: JSON.stringify({
@@ -155,7 +155,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
     const handleUnregister = async () => {
         const csrfToken = await getCsrfToken();
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event?.id}/users/${userId}/unregister`,
+            `/api/events/${event?.id}/users/${userId}/unregister`,
             {
                 method: "DELETE",
                 headers: {
@@ -194,7 +194,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
 
             console.log("Form data to be sent:", form);
             try {
-                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event?.id}`, {
+                await fetch(`/api/events/${event?.id}`, {
                     method: 'PUT',
                     headers,
                     body: requestBody,
@@ -214,7 +214,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
 
     const handleDeleteEvent = async () => {
         const csrfToken = await getCsrfToken();
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events/${event?.id}`, {
+        const res = await fetch(`/api/events/${event?.id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

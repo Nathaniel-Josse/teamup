@@ -1,6 +1,6 @@
 export const getCsrfToken = async () => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+        const response = await fetch(`/api/csrf-token`, {
             credentials: 'include'
         });
         console.log("CSRF token requested");

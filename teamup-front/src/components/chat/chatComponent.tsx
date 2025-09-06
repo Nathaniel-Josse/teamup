@@ -48,7 +48,7 @@ const ChatComponent: React.FC = () => {
             }
             const userId = getUserIdFromToken(userToken);
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${userId}`);
+                const res = await fetch(`/api/profiles/user/${userId}`);
                 if (!res.ok) throw new Error("Erreur lors de la vérification du profil utilisateur.");
                 const data = await res.json();
                 setHasProfile(!!data.exists);
@@ -69,7 +69,7 @@ const ChatComponent: React.FC = () => {
             const userId = getUserIdFromToken(userToken);
 
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/user/${userId}`);
+                const response = await fetch(`/api/chat/rooms/user/${userId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch user rooms');
                 }
@@ -141,7 +141,7 @@ const ChatComponent: React.FC = () => {
             }
 
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/messages?timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+                const response = await fetch(`/api/chat/rooms/${selectedRoomId}/messages?timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch messages');
                 }
@@ -186,7 +186,7 @@ const ChatComponent: React.FC = () => {
     const fetchRoomMembers = async () => {
         if (!selectedRoomId) return;
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/members`);
+            const response = await fetch(`/api/chat/rooms/${selectedRoomId}/members`);
             if (!response.ok) {
                 throw new Error('Failed to fetch room members');
             }
@@ -211,7 +211,7 @@ const ChatComponent: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${selectedRoomId}/members`, {
+            const response = await fetch(`/api/chat/rooms/${selectedRoomId}/members`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ const ChatComponent: React.FC = () => {
 
         try {
             const userId = getUserIdFromToken(userToken);
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms`, {
+            const response = await fetch(`/api/chat/rooms`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -290,7 +290,7 @@ const ChatComponent: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/rooms/${roomId}/members/${userId}`, {
+            const response = await fetch(`/api/chat/rooms/${roomId}/members/${userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

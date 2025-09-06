@@ -52,7 +52,7 @@ export default function Events() {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`);
+                const res = await fetch(`/api/events`);
                 if (!res.ok) throw new Error("Erreur lors de la récupération des événements.");
                 const data = await res.json();
                 setEvents(data);
@@ -86,7 +86,7 @@ export default function Events() {
             headers["X-CSRF-Token"] = csrfToken;
 
             try {
-                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/events`, {
+                await fetch(`/api/events`, {
                     method: 'POST',
                     headers,
                     body: requestBody,
@@ -105,7 +105,7 @@ export default function Events() {
     };
 
     async function getCsrfToken() {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/csrf-token`, {
+        const res = await fetch(`/api/csrf-token`, {
             credentials: "include",
         });
         const data = await res.json();

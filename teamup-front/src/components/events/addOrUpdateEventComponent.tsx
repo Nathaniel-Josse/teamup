@@ -71,7 +71,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
     useEffect(() => {
         const checkUserProfile = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profiles/user/${userId}`);
+                const res = await fetch(`/api/profiles/user/${userId}`);
                 if (!res.ok) throw new Error("Erreur lors de la vérification du profil utilisateur.");
                 const data = await res.json();
                 setHasProfile(!!data.exists);
@@ -82,7 +82,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
         };
         const fetchSports = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sports`);
+                const res = await fetch(`/api/sports`);
                 const data = await res.json();
                 setSports(data);
             } catch {
