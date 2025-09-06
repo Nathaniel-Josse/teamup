@@ -128,18 +128,14 @@ exports.removeRoomMember = async (req, res) => {
 // MESSAGES CRUD
 exports.createMessage = async (req, res) => {
     const { roomMemberId, content } = req.body;
-    console.log("Creating message with req:", req.body);
-    if (content.length > 1000) return res?.status(400).json({ error: 'Content too long' });
-    console.log("a");
+    if (content.length > 1024) return res?.status(400).json({ error: 'Content too long' });
     try {
         const [result] = await db.query(
             'INSERT INTO messages (room_member_id, content) VALUES (?, ?)',
             [roomMemberId, content]
         );
-        console.log("b: ", result);
         const messageId = result.insertId;
         const [rows] = await db.query('SELECT * FROM messages WHERE id = ?', [messageId]);
-        console.log("c: ", rows);
         if (res) {
             res.status(201).json(rows[0]);
         }

@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
         cspHeader = `
         default-src 'self';
         script-src 'self' 'nonce-${nonce}' https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/ https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*;
-        connect-src 'self' ${backendUrl} https://www.google.com https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*  https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://nominatim.openstreetmap.org https://api.mapbox.com https://www.gstatic.com/recaptcha/releases/;
+        connect-src 'self' ${backendUrl} ${backendChatUrl} https://www.google.com https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*  https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://nominatim.openstreetmap.org https://api.mapbox.com https://www.gstatic.com/recaptcha/releases/;
         style-src 'self' 'nonce-${nonce}' https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*;
         img-src 'self' blob: data: https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@* https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
         frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/;

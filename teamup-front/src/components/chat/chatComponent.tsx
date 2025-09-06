@@ -93,7 +93,10 @@ const ChatComponent: React.FC = () => {
 
         const newSocket = io(SOCKET_SERVER_URL, {
             auth: { token: userToken },
-            transports: ['websocket'],
+            transports: ['websocket', 'polling'],
+            reconnectionAttempts: 5,
+            reconnectionDelay: 2000,
+            secure: process.env.NEXT_PUBLIC_NODE_ENV === 'production',
         });
 
         newSocket.on('connect', () => {
@@ -385,6 +388,15 @@ const ChatComponent: React.FC = () => {
                         <div className="font-bold text-lg p-4 border-b border-gray-300 text-black flex justify-between items-center">
                             Salons
                             <button
+                                onClick={() => { handleCreateRoom(); setShowSidebar(false); }}
+                                className="p-1 rounded bg-gray-300 ml-2"
+                                aria-label='Créer un salon'
+                            >
+                                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M10 4v12M4 10h12" />
+                                </svg>
+                            </button>
+                            <button
                                 className="p-1 rounded bg-gray-300 ml-2"
                                 onClick={() => setShowSidebar(false)}
                                 aria-label="Fermer le menu"
@@ -404,14 +416,6 @@ const ChatComponent: React.FC = () => {
                                     {room.name}
                                 </p>
                             ))}
-                        </div>
-                        <div className="p-4 border-t border-gray-300">
-                            <button
-                                onClick={() => { handleCreateRoom(); setShowSidebar(false); }}
-                                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                            >
-                                Créer un salon
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -487,6 +491,9 @@ const ChatComponent: React.FC = () => {
                         Envoyer
                     </button>
                 </div>
+                <small className="text-gray-500 ml-4 mb-4">
+                    1024 caractères max
+                </small>
             </div>
             {showMembersPopup && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
