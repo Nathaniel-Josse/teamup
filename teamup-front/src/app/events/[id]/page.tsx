@@ -30,8 +30,6 @@ async function fetchWithContext(url: string, options?: RequestInit) {
     const baseUrl = getBaseUrl();
     const fullUrl = baseUrl ? `${baseUrl}${url}` : url;
     
-    console.log(`Fetching: ${fullUrl} (base: ${baseUrl}, relative: ${url})`);
-    
     try {
         const response = await fetch(fullUrl, {
             ...options,
@@ -41,36 +39,31 @@ async function fetchWithContext(url: string, options?: RequestInit) {
             },
         });
         
-        console.log(`Response: ${response.status} for ${fullUrl}`);
         return response;
     } catch (error) {
-        console.error(`Fetch error for ${fullUrl}:`, error);
+        console.error(`Erreur lors de la récupération de ${fullUrl}:`, error);
         throw error;
     }
 }
 
 // Helper to fetch the event data
 async function getEvent(id: string) {
-    try {
-        console.log(`Fetching event with ID: ${id}`);
-        
+    try {        
         const res = await fetchWithContext(`/api/events/${id}`, {
             next: { revalidate: 60 },
         });
         
         if (!res.ok) {
             if (res.status === 404) {
-                console.log(`Event not found: ${id}`);
                 return null;
             }
             throw new Error(`HTTP error! status: ${res.status}`);
         }
         
         const data = await res.json();
-        console.log(`Event fetched successfully`);
         return data;
     } catch (error) {
-        console.error(`Error fetching event ${id}:`, error);
+        console.error(`Erreur lors de la récupération de l'événement ${id}:`, error);
         return null;
     }
 }
@@ -82,8 +75,6 @@ async function getOrganizer(organizerUserId: string) {
     }
     
     try {
-        console.log(`Fetching organizer profile for user: ${organizerUserId}`);
-        
         // Get user's profile ID
         const userRes = await fetchWithContext(`/api/profiles/user/${organizerUserId}`, {
             next: { revalidate: 300 },
@@ -110,7 +101,7 @@ async function getOrganizer(organizerUserId: string) {
         const profileData = await profileRes.json();
         return profileData;
     } catch (error) {
-        console.error(`Error fetching organizer:`, error);
+        console.error(`Erreur lors de la récupération de l'organisateur:`, error);
         return null;
     }
 }
@@ -121,9 +112,7 @@ async function getSport(sportId: number) {
         return null;
     }
     
-    try {
-        console.log(`Fetching sport with ID: ${sportId}`);
-        
+    try {        
         const res = await fetchWithContext(`/api/sports/${sportId}`, {
             next: { revalidate: 3600 },
         });
@@ -135,7 +124,7 @@ async function getSport(sportId: number) {
         const sportData = await res.json();
         return sportData;
     } catch (error) {
-        console.error(`Error fetching sport:`, error);
+        console.error(`Erreur lors de la récupération du sport:`, error);
         return null;
     }
 }
@@ -145,23 +134,14 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         const { id } = await params;
         
         if (!id) {
-            console.error('No event ID provided');
+            console.error('Aucun ID d\'événement fourni');
             notFound();
         }
-
-        console.log(`Loading event page for ID: ${id}`);
-        console.log('Environment info:', {
-            NODE_ENV: process.env.NODE_ENV,
-            NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-            RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
-            isServer: typeof window === 'undefined',
-        });
         
         // Fetch the main event first
         const currentEvent = await getEvent(id);
         
         if (!currentEvent) {
-            console.log(`Event not found: ${id}`);
             notFound();
         }
 
@@ -176,13 +156,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         const sport = currentSport.status === 'fulfilled' ? currentSport.value : null;
 
         if (currentOrganizer.status === 'rejected') {
-            console.error('Failed to fetch organizer:', currentOrganizer.reason);
+            console.error('Erreur lors de la récupération de l\'organisateur:', currentOrganizer.reason);
         }
         if (currentSport.status === 'rejected') {
-            console.error('Failed to fetch sport:', currentSport.reason);
+            console.error('Erreur lors de la récupération du sport:', currentSport.reason);
         }
-
-        console.log(`Event page data loaded successfully for ID: ${id}`);
 
         return (
             <EventDetailsClientComponent 
@@ -192,7 +170,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             />
         );
     } catch (error) {
-        console.error('Error in EventPage component:', error);
-        throw new Error('Failed to load event page');
+        console.error('Erreur dans le composant EventPage:', error);
+        throw new Error('Échec du chargement de la page de l\'événement');
     }
 }

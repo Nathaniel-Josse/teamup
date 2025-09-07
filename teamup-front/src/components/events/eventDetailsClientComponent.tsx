@@ -77,7 +77,6 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
 
     useEffect(() => {
         const checkUserProfile = async () => {
-            console.log("Checking user profile...");
             const userStr = localStorage.getItem("user");
             if (!userStr) {
                 setHasProfile(false);
@@ -192,7 +191,6 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
             }
             headers["X-CSRF-Token"] = csrfToken;
 
-            console.log("Form data to be sent:", form);
             try {
                 await fetch(`/api/events/${event?.id}`, {
                     method: 'PUT',

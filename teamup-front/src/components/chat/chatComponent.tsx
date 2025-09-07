@@ -80,7 +80,7 @@ const ChatComponent: React.FC = () => {
                     setSelectedRoomId(data[0].room_id);
                 }
             } catch (error) {
-                console.error("Error fetching user rooms:", error);
+                console.error("Erreur lors de la récupération des salons de l'utilisateur:", error);
             }
         };
 
@@ -100,16 +100,13 @@ const ChatComponent: React.FC = () => {
         });
 
         newSocket.on('connect', () => {
-            console.log('Successfully connected to the socket server');
         });
 
         newSocket.on('new_message', (message) => {
-            console.log("New message received:", message);
             setMessages(prevMessages => [...prevMessages, message]);
         });
 
         newSocket.on('disconnect', () => {
-            console.log('Disconnected from socket server');
         });
 
         socketRef.current = newSocket;
@@ -129,8 +126,7 @@ const ChatComponent: React.FC = () => {
 
             // Check if the user is switching to a different room
             if (currentRoomRef.current !== selectedRoomId) {
-                console.log(`Switching from room ${currentRoomRef.current} to ${selectedRoomId}`);
-
+                
                 // 1. Leave the old room on the backend
                 if (currentRoomRef.current) {
                     socketRef.current.emit('leave_room', currentRoomRef.current);
@@ -146,24 +142,17 @@ const ChatComponent: React.FC = () => {
             try {
                 const response = await fetch(`/api/chat/rooms/${selectedRoomId}/messages?timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
                 if (!response.ok) {
-                    throw new Error('Failed to fetch messages');
+                    throw new Error('Échec de la récupération des messages');
                 }
                 const data = await response.json();
                 setMessages(data);
             } catch (error) {
-                console.error("Error fetching messages:", error);
+                console.error("Erreur lors de la récupération des messages:", error);
             }
         };
 
         fetchMessages();
 
-    }, [selectedRoomId]);
-
-    // This useEffect handles the room change logic
-    useEffect(() => {
-        if (socketRef.current) {
-            console.log(`Switching to new room: ${selectedRoomId}`);
-        }
     }, [selectedRoomId]);
 
     // Automatically scroll to the bottom of the chat
@@ -176,7 +165,6 @@ const ChatComponent: React.FC = () => {
     const sendMessage = () => {
         if (input.trim() && socketRef.current && selectedRoomId) {
             socketRef.current.emit('send_message', { roomId: selectedRoomId, userId: getUserIdFromToken(userToken), content: input, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
-            console.log("Message sent:", input);
             setInput('');
         }
     };
@@ -191,13 +179,13 @@ const ChatComponent: React.FC = () => {
         try {
             const response = await fetch(`/api/chat/rooms/${selectedRoomId}/members`);
             if (!response.ok) {
-                throw new Error('Failed to fetch room members');
+                throw new Error('Échec de la récupération des membres du salon');
             }
             const data = await response.json();
             setRoomMembers(data);
             setShowMembersPopup(true);
         } catch (error) {
-            console.error("Error fetching room members:", error);
+            console.error("Erreur lors de la récupération des membres du salon:", error);
         }
     };
 
@@ -276,7 +264,7 @@ const ChatComponent: React.FC = () => {
             setSelectedRoomId(newRoom.room_id);
 
         } catch (error) {
-            console.error("Error creating room:", error);
+            console.error("Erreur lors de la création du salon:", error);
             alert("Erreur lors de la création du salon.");
         }
     };

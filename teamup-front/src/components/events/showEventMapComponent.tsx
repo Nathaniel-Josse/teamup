@@ -4,8 +4,6 @@ import { MapContainer, TileLayer, Marker } from "react-leaflet";
 
 export default function ShowEventMapComponent({ event }: { event: { lat: number; lon: number } }) {
 
-    console.log("ShowEventMapComponent", event);
-
     if (!event || !event.lat || !event.lon) {
         return <div className="text-center text-gray-500">Aucune localisation disponible</div>;
     }

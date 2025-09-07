@@ -3,15 +3,13 @@ export const getCsrfToken = async () => {
         const response = await fetch(`/api/csrf-token`, {
             credentials: 'include'
         });
-        console.log("CSRF token requested");
-        console.dir(response);
         if (!response.ok) {
-            throw new Error('Failed to fetch CSRF token');
+            throw new Error('Échec de la récupération du token CSRF');
         }
         const data = await response.json();
         return data.csrfToken;
     } catch (error) {
-        console.error("Error getting CSRF token:", error);
+        console.error("Erreur lors de la récupération du token CSRF:", error);
         return null;
     }
 };
