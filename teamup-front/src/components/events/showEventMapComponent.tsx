@@ -22,8 +22,7 @@ export default function ShowEventMapComponent({ event }: { event: { lat: number;
             center={[event.lat, event.lon]}
             zoom={15}
             scrollWheelZoom={false}
-            style={{ height: "250px", width: "100%" }}
-            className="rounded z-0"
+            className="rounded z-0 h-[250px] w-full"
         >
             <TileLayer
                 attribution='&copy; OpenStreetMap contributors'

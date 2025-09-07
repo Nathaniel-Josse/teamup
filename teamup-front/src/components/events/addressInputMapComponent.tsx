@@ -149,8 +149,7 @@ export default function AddressInputWithMapComponent({
                 center={[position.lat, position.lng]}
                 zoom={13}
                 scrollWheelZoom={true}
-                style={{ height: "300px", width: "100%", zIndex: 0 }}
-                className="z-0"
+                className="z-0 h-[300px] w-full"
             >
                 <TileLayer
                     attribution='&copy; OpenStreetMap contributors'

@@ -436,8 +436,7 @@ const ChatComponent: React.FC = () => {
                                         <img
                                             src="/assets/images/person.svg"
                                             alt="Membres"
-                                            className="w-8 h-8"
-                                            style={{ display: "block" }}
+                                            className="w-8 h-8 block"
                                         />
                                     </span>
                                 </button>
@@ -454,8 +453,7 @@ const ChatComponent: React.FC = () => {
                                         <img
                                             src="/assets/images/leave-chat.svg"
                                             alt="Quitter le salon"
-                                            className="w-8 h-8"
-                                            style={{ display: "block" }}
+                                            className="w-8 h-8 block"
                                         />
                                     </span>
                                 </button>

@@ -64,7 +64,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event }) => {
                     className="object-cover w-full h-full"
                     width={800}
                     height={800}
-                    style={{ objectFit: "cover", width: "100%", height: "100%" }}
                 />
             </div>
             <div className="flex-1 w-full">
