@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 //const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -14,6 +16,45 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const RedisStore = connectRedis(session);
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('Created uploads directory at:', uploadsDir);
+}
+
+// Serve static files from uploads directory - ADD THIS BEFORE OTHER MIDDLEWARE
+app.use('/uploads', express.static(uploadsDir, {
+    maxAge: '7d', // Cache for 7 days
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+        // Set proper CORS headers for images
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        res.setHeader('Cache-Control', 'public, max-age=604800'); // 7 days
+    }
+}));
+
+// Health check for uploaded files
+app.get('/uploads/health', (req, res) => {
+    try {
+        const files = fs.readdirSync(uploadsDir);
+        res.json({ 
+            status: 'ok', 
+            filesCount: files.length,
+            uploadsDir: uploadsDir,
+            recentFiles: files.slice(-5) // Show last 5 files
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            status: 'error', 
+            message: 'Cannot access uploads directory',
+            error: error.message 
+        });
+    }
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -187,4 +228,6 @@ app.use((error, req, res, next) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${process.env.BACKEND_URL}:${PORT}`);
+    console.log(`Static files served from: ${uploadsDir}`);
+    console.log(`File uploads available at: /uploads/*`);
 });

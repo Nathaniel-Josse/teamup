@@ -18,10 +18,10 @@ const upload = multer({ storage: storage });
 // Export multer middleware for use in routes
 exports.uploadEventPicture = upload.single('picture');
 
-// Create a new event
+// Updated createEvent function
 exports.createEvent = async (req, res) => {
     console.log("Creating event with body:", req.body);
-    console.log("Uploaded file:", req.file); // Add this for debugging
+    console.log("Uploaded file:", req.file);
     
     const {
         organizer_user_id,
@@ -37,13 +37,12 @@ exports.createEvent = async (req, res) => {
         description
     } = req.body;
 
-    // Handle picture upload - only use uploaded file, ignore blob URLs
+    // Handle picture upload - create full URL for the uploaded file
     let picture = null;
     if (req.file) {
         picture = `/uploads/${req.file.filename}`;
-        console.log("Picture set to:", picture); // Debug log
+        console.log("Picture uploaded successfully:", picture);
     }
-    // Remove the fallback to req.body.picture as it contains invalid blob URL
 
     // Validate required fields
     if (
@@ -78,19 +77,88 @@ exports.createEvent = async (req, res) => {
                 max_attendees,
                 status,
                 description,
-                picture
+                picture // Full URL to the uploaded file
             ]
         );
         
-        console.log("Event created successfully with ID:", result.insertId); // Debug log
+        console.log("Event created successfully with ID:", result.insertId);
         res.status(201).json({ 
             message: 'Événement créé', 
             picture,
             eventId: result.insertId 
         });
     } catch (err) {
-        console.error("Database error:", err); // Add detailed error logging
+        console.error("Database error:", err);
         res.status(500).json({ message: 'Erreur de serveur.', error: err.message });
+    }
+};
+
+// Updated updateEvent function
+exports.updateEvent = async (req, res) => {
+    const { id } = req.params;
+    const {
+        sport_id,
+        title,
+        starting_date,
+        ending_date,
+        location,
+        lat,
+        lon,
+        max_attendees,
+        status,
+        description,
+        userId
+    } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ message: "ID événement manquant." });
+    }
+
+    if (!userId) {
+        return res.status(403).json({ message: "Utilisateur non autorisé." });
+    }
+
+    try {
+        const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
+        if (event.length === 0) {
+            return res.status(404).json({ message: "Événement non trouvé." });
+        }
+        if (event[0].organizer_user_id !== userId) {
+            return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cet événement." });
+        }
+
+        // Handle picture upload - create full URL for the uploaded file
+        let picture = null;
+        if (req.file) {
+            picture = `/uploads/${req.file.filename}`;
+            console.log("New picture uploaded:", picture);
+        }
+
+        const fields = [];
+        const values = [];
+        if (sport_id) { fields.push("sport_id = ?"); values.push(sport_id); }
+        if (title) { fields.push("title = ?"); values.push(title); }
+        if (starting_date) { fields.push("starting_date = ?"); values.push(starting_date); }
+        if (ending_date) { fields.push("ending_date = ?"); values.push(ending_date); }
+        if (location) { fields.push("location = ?"); values.push(location); }
+        if (lat) { fields.push("lat = ?"); values.push(lat); }
+        if (lon) { fields.push("lon = ?"); values.push(lon); }
+        if (max_attendees) { fields.push("max_attendees = ?"); values.push(max_attendees); }
+        if (status) { fields.push("status = ?"); values.push(status); }
+        if (description) { fields.push("description = ?"); values.push(description); }
+        if (picture) { fields.push("picture = ?"); values.push(picture); }
+
+        if (fields.length === 0) {
+            return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
+        }
+
+        values.push(id);
+        await db.query(`UPDATE events SET ${fields.join(", ")} WHERE id = ?`, values);
+        
+        res.json({ message: "Événement mis à jour.", picture });
+    } catch (err) {
+        console.error("Update event error:", err);
+        res.status(500).json({ message: "Erreur de serveur.", error: err.message });
     }
 };
 
@@ -129,76 +197,6 @@ exports.getEventById = async (req, res) => {
         }
         res.json(events[0]);
     } catch (err) {
-        res.status(500).json({ message: "Erreur de serveur.", error: err.message });
-    }
-};
-
-// Update an event
-exports.updateEvent = async (req, res) => {
-    const { id } = req.params;
-    const {
-        sport_id,
-        title,
-        starting_date,
-        ending_date,
-        location,
-        lat,
-        lon,
-        max_attendees,
-        status,
-        description,
-        userId
-    } = req.body;
-
-    if (!id) {
-        return res.status(400).json({ message: "ID événement manquant." });
-    }
-
-    // Check if user is authorized
-    if (!userId) {
-        return res.status(403).json({ message: "Utilisateur non autorisé." });
-    }
-
-    try {
-        const [event] = await db.query('SELECT * FROM events WHERE id = ?', [id]);
-        if (event.length === 0) {
-            return res.status(404).json({ message: "Événement non trouvé." });
-        }
-        if (event[0].organizer_user_id !== userId) {
-            return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cet événement." });
-        }
-
-        // Handle picture upload - only use uploaded file, ignore blob URLs
-        let picture = null;
-        if (req.file) {
-            picture = `/uploads/${req.file.filename}`;
-        }
-        // Don't use req.body.picture as fallback for blob URLs
-
-        const fields = [];
-        const values = [];
-        if (sport_id) { fields.push("sport_id = ?"); values.push(sport_id); }
-        if (title) { fields.push("title = ?"); values.push(title); }
-        if (starting_date) { fields.push("starting_date = ?"); values.push(starting_date); }
-        if (ending_date) { fields.push("ending_date = ?"); values.push(ending_date); }
-        if (location) { fields.push("location = ?"); values.push(location); }
-        if (lat) { fields.push("lat = ?"); values.push(lat); }
-        if (lon) { fields.push("lon = ?"); values.push(lon); }
-        if (max_attendees) { fields.push("max_attendees = ?"); values.push(max_attendees); }
-        if (status) { fields.push("status = ?"); values.push(status); }
-        if (description) { fields.push("description = ?"); values.push(description); }
-        if (picture) { fields.push("picture = ?"); values.push(picture); }
-
-        if (fields.length === 0) {
-            return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
-        }
-
-        values.push(id);
-        await db.query(`UPDATE events SET ${fields.join(", ")} WHERE id = ?`, values);
-        
-        res.json({ message: "Événement mis à jour.", picture });
-    } catch (err) {
-        console.error("Update event error:", err); // Add error logging
         res.status(500).json({ message: "Erreur de serveur.", error: err.message });
     }
 };
