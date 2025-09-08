@@ -199,6 +199,12 @@ export default function Privacy() {
                         Si aucun bandeau n&apos;apparaît, cela signifie qu&apos;aucun cookie tiers n&apos;a été mis en place sur le site pour le moment. Notez toutefois que vous acceptez l&apos;utilisation de cookies nécessaires au fonctionnement du site.
                     </p>
                 </section>
+                <section className="mb-6">
+                    <h3 className="font-semibold mb-1">Suppression de vos données personnelles et autres requêtes</h3>
+                    <p>
+                        Vous pouvez supprimer vos données personnelles en nous contactant directement. Nous nous engageons à répondre à toutes les demandes de suppression dans les meilleurs délais et à respecter vos choix en matière de confidentialité.
+                    </p>
+                </section>
             </div> 
         </main>
     );
