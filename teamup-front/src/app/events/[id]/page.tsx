@@ -1,15 +1,8 @@
 import EventDetailsClientComponent from "@/components/events/eventDetailsClientComponent";
 import { notFound } from 'next/navigation';
 
-// Helper to get the correct base URL for different contexts
+// Helper to get the correct base URL for server-side rendering
 function getBaseUrl() {
-    // Client-side: use relative URLs
-    if (typeof window !== 'undefined') {
-        return '';
-    }
-    
-    // Server-side: we need absolute URLs
-    
     // Check for explicitly set API URL
     if (process.env.NEXT_PUBLIC_API_URL) {
         return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, ''); // Remove trailing slash
@@ -25,10 +18,10 @@ function getBaseUrl() {
     return `http://localhost:${port}`;
 }
 
-// Create a fetch wrapper that handles SSR vs client-side differences
+// Create a fetch wrapper for server-side requests
 async function fetchWithContext(url: string, options?: RequestInit) {
     const baseUrl = getBaseUrl();
-    const fullUrl = baseUrl ? `${baseUrl}${url}` : url;
+    const fullUrl = `${baseUrl}${url}`;
     
     try {
         const response = await fetch(fullUrl, {
