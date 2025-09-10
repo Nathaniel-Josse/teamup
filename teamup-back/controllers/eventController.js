@@ -3,6 +3,32 @@ const path = require('path');
 const multer = require('multer');
 const geolib = require('geolib');
 
+// File validation configuration
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+const ALLOWED_MIME_TYPES = [
+    'image/png',
+    'image/jpg',
+    'image/jpeg',
+    'image/webp'
+];
+const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'];
+
+// File filter function
+const fileFilter = (req, file, cb) => {
+    // Check MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+        return cb(new Error('Type de fichier non autorisé. Seuls les formats PNG, JPG, JPEG et WEBP sont acceptés.'), false);
+    }
+    
+    // Check file extension
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+        return cb(new Error('Extension de fichier non autorisée. Seuls les formats PNG, JPG, JPEG et WEBP sont acceptés.'), false);
+    }
+    
+    cb(null, true);
+};
+
 // Multer setup for /uploads folder
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,7 +39,14 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + '-' + file.originalname);
     }
 });
-const upload = multer({ storage: storage });
+
+const upload = multer({ 
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: MAX_FILE_SIZE
+    }
+});
 
 // Export multer middleware for use in routes
 exports.uploadEventPicture = upload.single('picture');
@@ -233,4 +266,4 @@ exports.deleteEvent = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Erreur de serveur.", error: err.message });
     }
-}
+};

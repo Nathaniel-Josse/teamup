@@ -210,7 +210,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <label className="font-semibold text-gray-700 w-full text-center mb-1">
-                                        Date de début:
+                                        Date de début (UTC +0):
                                     </label>
                                     <input
                                         name="starting_date"
@@ -223,7 +223,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <label className="font-semibold text-gray-700 w-full text-center mb-1">
-                                        Date de fin:
+                                        Date de fin (UTC +0):
                                     </label>
                                     <input
                                         name="ending_date"
@@ -290,7 +290,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <label className="font-semibold text-gray-700 w-full text-center mb-1">
-                                        Image de l&apos;événement:
+                                        Image de l&apos;événement (jpeg, png, webp. Max 5MB):
                                     </label>
                                     <input
                                         type="file"
