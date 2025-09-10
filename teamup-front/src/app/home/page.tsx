@@ -77,7 +77,7 @@ export default function Home() {
                             <div key={idx} className="flex flex-col items-center">
                                 <Image
                                     src={img}
-                                    alt="Sport event"
+                                    alt="Image d'illustration d'événement sportif"
                                     width={394}
                                     height={394}
                                     className="opacity-80"
@@ -88,7 +88,7 @@ export default function Home() {
                 </div>
                 <div className="relative z-10 flex justify-center mt-4">
                     <Link href="/events">
-                        <button className="px-8 py-4 bg-blue-600 text-white text-xl font-bold rounded shadow hover:bg-blue-700 transition">
+                        <button className="px-8 py-4 text-white text-xl font-bold rounded shadow transition">
                             Voir les événements
                         </button>
                     </Link>
@@ -103,7 +103,7 @@ export default function Home() {
                 <ChatBubbleLeftRightIcon className="h-40 w-40 text-center text-white mr-2" />
                 <div className="flex justify-center">
                     <Link href="/chat">
-                        <button className="px-8 py-4 bg-green-600 text-white text-xl font-bold rounded shadow hover:bg-green-700 transition">
+                        <button className="px-8 py-4 text-white text-xl font-bold rounded shadow transition">
                             Accéder au chat
                         </button>
                     </Link>
