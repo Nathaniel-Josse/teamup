@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
     const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
-    const backendUploadsUrl = process.env.NEXT_PUBLIC_BACKEND_UPLOADS_URL || "http://localhost:3002";
+    const backendUploadsUrl = process.env.NEXT_PUBLIC_BACKEND_UPLOADS_URL || "http://localhost:3001/uploads";
     const backendChatUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
     let cspHeader = '';
 
@@ -29,9 +29,9 @@ export function middleware(request: NextRequest) {
         cspHeader = `
         default-src 'self';
         script-src 'self' 'nonce-${nonce}' https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/ https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*;
-        connect-src 'self' ${backendUrl} ${backendChatUrl} https://www.google.com https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*  https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://nominatim.openstreetmap.org https://api.mapbox.com https://www.gstatic.com/recaptcha/releases/;
+        connect-src 'self' ${backendUrl} ${backendChatUrl} ${backendUploadsUrl} https://www.google.com https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*  https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://nominatim.openstreetmap.org https://api.mapbox.com https://www.gstatic.com/recaptcha/releases/;
         style-src 'self' 'nonce-${nonce}' https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@*;
-        img-src 'self' ${backendUrl} blob: data: https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@* https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
+        img-src 'self' ${backendUrl} ${backendUploadsUrl} https://teamup-back-dkxu:3001/ blob: data: https://unpkg.com/leaflet@* https://cdn.jsdelivr.net/npm/leaflet@* https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
         frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/;
         object-src 'none';
         base-uri 'self';

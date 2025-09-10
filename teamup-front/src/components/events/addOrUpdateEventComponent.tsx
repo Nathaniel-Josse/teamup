@@ -153,7 +153,7 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
 
     const getPictureUrl = (): string => {
         try {
-            const picture = isAnUpdate ? process.env.NEXT_PUBLIC_UPLOAD_PROTOCOL + "://" + process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + form.picture : form.picture;
+            const picture = isAnUpdate ? process.env.NEXT_PUBLIC_UPLOADS_PROTOCOL + "://" + process.env.NEXT_PUBLIC_UPLOADS_HOST + ":" + process.env.NEXT_PUBLIC_UPLOADS_PORT + form.picture : form.picture;
             if (picture) {
                 return picture;
             }
