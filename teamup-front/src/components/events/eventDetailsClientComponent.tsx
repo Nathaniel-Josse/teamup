@@ -65,7 +65,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
     const [event] = useState<Event>(currentEvent);
     const [userId, setUserId] = useState<string | null>(null);
     const [organizer] = useState<Organizer>(currentOrganizer);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true); // Start with true to prevent hydration mismatch
     const [isOrganizer, setIsOrganizer] = useState<boolean>(false);
     const [isRegistered, setIsRegistered] = useState<boolean>(false);
     const [showForm, setShowForm] = useState<boolean>(false);
@@ -74,8 +74,12 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
     const [currentAttendees, setCurrentAttendees] = useState<any[]>([]);
     const [hasProfile, setHasProfile] = useState<boolean>(true); // default true for loading
     const [showProfilePopup, setShowProfilePopup] = useState<boolean>(false);
+    const [isMounted, setIsMounted] = useState<boolean>(false); // Add mounted state
 
     useEffect(() => {
+        // Set mounted flag first
+        setIsMounted(true);
+        
         const checkUserProfile = async () => {
             const userStr = localStorage.getItem("user");
             if (!userStr) {
@@ -93,9 +97,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
                 setHasProfile(false);
             }
         };
-        checkUserProfile();
 
-        // Check if the current user is the organizer
         const organizerChecks = async () => {
             const currentUserId = JSON.parse(localStorage.getItem("user") || "{}").id;
             setUserId(currentUserId);
@@ -117,7 +119,9 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
                 }
             }
         }
-        organizerChecks().then(() => {
+
+        // Run async operations
+        Promise.all([checkUserProfile(), organizerChecks()]).then(() => {
             setIsLoading(false);
         });
     }, [event?.id, organizer?.id]);
@@ -230,19 +234,20 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
         setShowDeletePopup(false);
     };
 
-    if (!event) {
-        return < Spinner />;
+    // Show spinner during SSR and initial mount
+    if (!event || !isMounted) {
+        return <Spinner />;
     }
 
     return (
-            <div className="mb-4 flex flex-col items-center justify-between">
-                <div className="flex items-center justify-between mb-4">
-                    <Link href="/events" className="flex items-center text-blue-600 hover:underline">
-                        <span className="mr-2">&#8592;</span> Retour aux événements
-                    </Link>
-                </div>
-                <h1 className="text-2xl text-center font-bold mb-6">Cet événement a retenu votre curiosité ?</h1>
-            { isLoading ? (
+        <div className="mb-4 flex flex-col items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
+                <Link href="/events" className="flex items-center text-blue-600 hover:underline">
+                    <span className="mr-2">&#8592;</span> Retour aux événements
+                </Link>
+            </div>
+            <h1 className="text-2xl text-center font-bold mb-6">Cet événement a retenu votre curiosité ?</h1>
+            {isLoading ? (
                 <Spinner />
             ) : (
                 <div>
@@ -271,7 +276,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
                         <p><span className="font-semibold">Nombre max de participants :</span> {event.max_attendees}</p>
                         <p><span className="font-semibold">Description :</span> {event.description}</p>
 
-                        { isOrganizer ? (
+                        {isOrganizer ? (
                             <div className="mt-4 flex flex-col items-center">
                                 <button
                                     className="px-4 py-2 text-white rounded"
@@ -279,7 +284,7 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
                                 >
                                     {showForm ? "Fermer le formulaire" : "Modifier l'événement"}
                                 </button>
-                                {showForm && userId &&(
+                                {showForm && userId && (
                                     <div>
                                         <AddOrUpdateEventComponent event={event} onUpdate={handleUpdateEvent} userId={userId} />
                                     </div>
@@ -326,25 +331,25 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
                             </div>
                         ) : (
                             <div>
-                            {isRegistered ? (
-                                <div className="flex flex-col items-center">
-                                    <button
-                                        className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                                        onClick={handleUnregister}
-                                    >
-                                        Se désinscrire de l&apos;événement
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center">
-                                    <button
-                                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                                        onClick={handleRegister}
-                                    >
-                                        S&apos;inscrire à l&apos;événement
-                                    </button>
-                                </div>
-                            )}
+                                {isRegistered ? (
+                                    <div className="flex flex-col items-center">
+                                        <button
+                                            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                            onClick={handleUnregister}
+                                        >
+                                            Se désinscrire de l&apos;événement
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center">
+                                        <button
+                                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                                            onClick={handleRegister}
+                                        >
+                                            S&apos;inscrire à l&apos;événement
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -373,5 +378,5 @@ export default function EventDetailsClientComponent({ currentEvent, currentOrgan
                 </div>
             )}
         </div>
-        );
-    }
+    );
+}
