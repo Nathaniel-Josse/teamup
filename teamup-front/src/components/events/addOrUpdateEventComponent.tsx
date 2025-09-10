@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AddressInputWithMapComponent from './addressInputMapComponent';
 import Spinner from '../spinner';
+import Image from 'next/image';
 
 type Status = 'open' | 'closed' | 'done' | 'cancelled';
 
@@ -300,10 +301,13 @@ const AddOrUpdateEventComponent: React.FC<EventComponentProps> = ({ event, onUpd
                                         className="w-4/5 border rounded px-2 py-1 flex-1 text-black"
                                     />
                                     {form.picture && (
-                                        <img
+                                        <Image
                                             src={getPictureUrl()}
                                             alt="Aperçu"
                                             className="mt-2 rounded max-h-40"
+                                            width={320}
+                                            height={160}
+                                            style={{ objectFit: 'cover' }}
                                         />
                                     )}
                                 </div>
